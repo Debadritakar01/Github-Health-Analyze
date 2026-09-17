@@ -1,13 +1,9 @@
-import Navbar from "./components/Navbar";
-
-function App() {
+function Navbar() {
   return (
-    <>
-      <Navbar />
-
+    <nav>
       <h1>GitHub Repository Health Analyzer</h1>
-    </>
+    </nav>
   );
 }
 
-export default App;
+export default Navbar;
