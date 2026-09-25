@@ -3,8 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from urllib.parse import urlparse
 
-from github_api import get_repository_info, get_readme
-from health_analyzer import calculate_documentation_score
+from github_api import (
+    get_repository_info,
+    get_readme,
+    get_repository_contents
+)
+
+from health_analyzer import (
+    calculate_documentation_score,
+calculate_testing_score,
+calculate_code_structure_score
+)
 
 
 
@@ -62,6 +71,7 @@ def home():
         "message": "GitHub Health Analyzer API is running"
     }
 
+
 @app.post("/analyze")
 async def analyze_repository(request: RepositoryRequest):
 
@@ -94,12 +104,27 @@ async def analyze_repository(request: RepositoryRequest):
         readme_content
     )
 
+    # Get repository files
+    repository_files = await get_repository_contents(
+        username,
+        repository_name
+    )
+
+    # Calculate testing score
+    testing_score = calculate_testing_score(
+        repository_files
+    )
+    code_structure_score = calculate_code_structure_score(
+     repository_files
+    )
     return {
         "message": "Repository analyzed successfully",
         "repository_url": request.repo_url,
         "repository": repository_info,
         "health_score": {
-            "documentation": documentation_score
+            "documentation": documentation_score,
+            "testing": testing_score,
+            "code_structure": code_structure_score
         }
     }
 

@@ -66,3 +66,22 @@ async def get_readme(username: str, repository: str):
 
     return response.text
 
+async def get_repository_contents(username: str, repository: str):
+
+    url = f"https://api.github.com/repos/{username}/{repository}/git/trees/HEAD?recursive=1"
+
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "GitHub-Health-Analyzer"
+    }
+
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        response = await client.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return None
+
+    data = response.json()
+
+    return data.get("tree", [])
+

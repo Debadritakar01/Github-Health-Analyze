@@ -233,3 +233,49 @@ grid-template-columns: repeat(2, 1fr);
   font-size: 18px;
 }
 
+
+.score-cards {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 25px 0;
+  flex-wrap: wrap;
+}
+
+.score-card {
+  min-width: 160px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.score-card .score {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.score-card p {
+  margin: 8px 0 0;
+  font-size: 16px;
+}
+
+.overall-score {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.overall-score h3 {
+  margin-bottom: 10px;
+}
+
+.overall-number {
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.overall-score p {
+  margin-top: 5px;
+  color: #666;
+}
+
