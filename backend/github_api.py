@@ -49,3 +49,20 @@ async def get_repository_info(username: str, repository: str):
         "open_issues": data.get("open_issues_count"),
         "default_branch": data.get("default_branch")
     }
+async def get_readme(username: str, repository: str):
+
+    url = f"https://api.github.com/repos/{username}/{repository}/readme"
+
+    headers = {
+        "Accept": "application/vnd.github.raw+json",
+        "User-Agent": "GitHub-Health-Analyzer"
+    }
+
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        response = await client.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return None
+
+    return response.text
+

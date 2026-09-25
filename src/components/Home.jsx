@@ -1,9 +1,10 @@
-```jsx
+
 import { useState } from "react";
 
 function Home() {
   const [repoUrl, setRepoUrl] = useState("");
   const [repository, setRepository] = useState(null);
+  const [healthScore, setHealthScore] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,6 +17,7 @@ function Home() {
     setLoading(true);
     setError("");
     setRepository(null);
+    setHealthScore(null);
 
     try {
       const response = await fetch("http://127.0.0.1:8000/analyze", {
@@ -35,6 +37,7 @@ function Home() {
       }
 
       setRepository(data.repository);
+      setHealthScore(data.health_score);
     } catch (err) {
       setError(
         err.message ||
@@ -74,8 +77,21 @@ function Home() {
       </section>
 
       {repository && (
-        <section className="result-section">
-          <h2>Repository Information</h2>
+  <section className="result-section">
+
+    {healthScore && (
+      <div className="health-score-card">
+        <h2>Repository Health Score</h2>
+
+        <div className="score">
+          {healthScore.documentation}/20
+        </div>
+
+        <p>Documentation</p>
+      </div>
+    )}
+
+    <h2>Repository Information</h2>
 
           <div className="repository-card">
             <h3>{repository.name}</h3>
@@ -130,4 +146,3 @@ function Home() {
 }
 
 export default Home;
-```
