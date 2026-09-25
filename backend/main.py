@@ -12,9 +12,11 @@ from github_api import (
 
 from health_analyzer import (
     calculate_documentation_score,
+    get_documentation_details,
     calculate_testing_score,
     calculate_code_structure_score,
     calculate_security_score,
+    get_security_details,
     calculate_maintainability_score
 )
 
@@ -101,6 +103,11 @@ async def analyze_repository(request: RepositoryRequest):
         readme_content
     )
 
+    documentation_details = get_documentation_details(
+        repository_info,
+        readme_content
+    )
+
     repository_files = await get_repository_contents(
         username,
         repository_name
@@ -118,20 +125,36 @@ async def analyze_repository(request: RepositoryRequest):
         repository_files
     )
 
+    security_details = get_security_details(
+        repository_files
+    )
+
     maintainability_score = calculate_maintainability_score(
         repository_files
     )
 
     return {
         "message": "Repository analyzed successfully",
+
         "repository_url": request.repo_url,
+
         "repository": repository_info,
+
         "health_score": {
-            "documentation": documentation_score,
+            "documentation": {
+                "score": documentation_score,
+                "details": documentation_details
+            },
+
             "testing": testing_score,
+
             "code_structure": code_structure_score,
-            "security": security_score,
+
+            "security": {
+                "score": security_score,
+                "details": security_details
+            },
+
             "maintainability": maintainability_score
         }
     }
-

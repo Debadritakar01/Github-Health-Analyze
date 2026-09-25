@@ -1,31 +1,58 @@
-def calculate_documentation_score(repository, readme_content=None):
+def calculate_documentation_score(repository_info, readme_content):
     score = 0
 
-    if repository.get("description"):
-        score += 5
+    if not repository_info:
+        return score
 
     if readme_content:
         score += 10
 
-        readme_lower = readme_content.lower()
+    if repository_info.get("description"):
+        score += 5
 
-        useful_sections = [
-            "installation",
-            "usage",
-            "features",
-            "technologies",
-            "contributing"
-        ]
-
-        section_count = sum(
-            1
-            for section in useful_sections
-            if section in readme_lower
-        )
-
-        score += min(section_count, 5)
+    if repository_info.get("language"):
+        score += 5
 
     return min(score, 20)
+
+
+def get_documentation_details(repository_info, readme_content):
+    details = []
+
+    if readme_content:
+        details.append({
+            "type": "success",
+            "message": "README file found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "README file not found."
+        })
+
+    if repository_info.get("description"):
+        details.append({
+            "type": "success",
+            "message": "Repository description found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "Repository description is missing."
+        })
+
+    if repository_info.get("language"):
+        details.append({
+            "type": "success",
+            "message": "Primary programming language detected."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "Programming language could not be detected."
+        })
+
+    return details
 
 
 def calculate_testing_score(repository_files):
@@ -87,6 +114,98 @@ def calculate_testing_score(repository_files):
     return min(score, 20)
 
 
+def get_testing_details(repository_files):
+    details = []
+
+    if not repository_files:
+        details.append({
+            "type": "warning",
+            "message": "Repository files could not be analyzed."
+        })
+        return details
+
+    file_paths = [
+        item.get("path", "").lower()
+        for item in repository_files
+    ]
+
+    testing_folders = [
+        "test/",
+        "tests/",
+        "__tests__/"
+    ]
+
+    has_testing_folder = any(
+        any(path.startswith(folder) for folder in testing_folders)
+        for path in file_paths
+    )
+
+    if has_testing_folder:
+        details.append({
+            "type": "success",
+            "message": "Testing directory found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No dedicated testing directory found."
+        })
+
+    testing_frameworks = [
+        "pytest",
+        "jest",
+        "vitest",
+        "mocha",
+        "junit",
+        "unittest"
+    ]
+
+    framework_found = any(
+        any(framework in path for framework in testing_frameworks)
+        for path in file_paths
+    )
+
+    if framework_found:
+        details.append({
+            "type": "success",
+            "message": "Testing framework detected."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No recognized testing framework detected."
+        })
+
+    test_files = [
+        path
+        for path in file_paths
+        if (
+            "test_" in path
+            or "_test." in path
+            or ".test." in path
+            or ".spec." in path
+        )
+    ]
+
+    if len(test_files) >= 2:
+        details.append({
+            "type": "success",
+            "message": f"{len(test_files)} test files detected."
+        })
+    elif len(test_files) == 1:
+        details.append({
+            "type": "warning",
+            "message": "Only one test file detected."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No test files detected."
+        })
+
+    return details
+
+
 def calculate_code_structure_score(repository_files):
     score = 0
 
@@ -98,72 +217,37 @@ def calculate_code_structure_score(repository_files):
         for item in repository_files
     ]
 
-    source_folders = [
+    important_folders = [
         "src/",
         "app/",
+        "components/",
         "backend/",
         "frontend/",
-        "lib/",
-        "components/"
+        "api/",
+        "utils/",
+        "services/"
     ]
 
-    has_source_folder = any(
-        any(path.startswith(folder) for folder in source_folders)
-        for path in file_paths
+    folders_found = sum(
+        1
+        for folder in important_folders
+        if any(path.startswith(folder) for path in file_paths)
     )
 
-    if has_source_folder:
+    if folders_found >= 2:
+        score += 10
+    elif folders_found == 1:
         score += 5
 
-    has_frontend = any(
-        path.startswith("frontend/")
-        for path in file_paths
-    )
-
-    has_backend = any(
-        path.startswith("backend/")
-        for path in file_paths
-    )
-
-    if has_frontend and has_backend:
+    if len(file_paths) > 5:
         score += 5
 
-    config_files = [
-        "package.json",
-        "requirements.txt",
-        "pyproject.toml",
-        "vite.config.js",
-        "vite.config.jsx",
-        "tsconfig.json"
-    ]
-
-    has_config_file = any(
-        path.split("/")[-1] in config_files
-        for path in file_paths
-    )
-
-    if has_config_file:
-        score += 3
-
-    root_files = [
-        path
-        for path in file_paths
-        if "/" not in path
-    ]
-
-    if len(root_files) <= 10:
-        score += 3
-
-    folders = set()
-
-    for path in file_paths:
-        if "/" in path:
-            folders.add(path.split("/")[0])
-
-    if len(folders) >= 2:
-        score += 2
+    if len(file_paths) > 15:
+        score += 5
 
     return min(score, 20)
+
+
 def calculate_security_score(repository_files):
     score = 0
 
@@ -175,64 +259,84 @@ def calculate_security_score(repository_files):
         for item in repository_files
     ]
 
-    # 1. Check for environment files
-    env_files = [
-        ".env",
-        ".env.example"
-    ]
-
-    has_env_file = any(
-        path.split("/")[-1] in env_files
-        for path in file_paths
-    )
-
-    if has_env_file:
-        score += 5
-
-    # 2. Check for security-related configuration
     security_files = [
+        ".gitignore",
+        ".env.example",
         "security.md",
-        "security.txt",
-        ".github/dependabot.yml",
-        ".github/dependabot.yaml"
+        "security.txt"
     ]
 
-    has_security_file = any(
-        path in security_files
-        for path in file_paths
-    )
-
-    if has_security_file:
-        score += 5
-
-    # 3. Check for GitHub workflows
-    has_github_workflows = any(
-        path.startswith(".github/workflows/")
-        for path in file_paths
-    )
-
-    if has_github_workflows:
-        score += 5
-
-    # 4. Check for dependency files
-    dependency_files = [
-        "package.json",
-        "requirements.txt",
-        "package-lock.json",
-        "yarn.lock",
-        "pipfile",
-        "poetry.lock"
-    ]
-
-    has_dependency_file = any(
-        path.split("/")[-1] in dependency_files
-        for path in file_paths
-    )
-
-    if has_dependency_file:
-        score += 5
+    for security_file in security_files:
+        if security_file in file_paths:
+            score += 5
 
     return min(score, 20)
+
+
+def get_security_details(repository_files):
+    details = []
+
+    if not repository_files:
+        details.append({
+            "type": "warning",
+            "message": "Repository files could not be analyzed."
+        })
+        return details
+
+    file_paths = [
+        item.get("path", "").lower()
+        for item in repository_files
+    ]
+
+    if ".gitignore" in file_paths:
+        details.append({
+            "type": "success",
+            "message": ".gitignore file found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": ".gitignore file not found."
+        })
+
+    if ".env.example" in file_paths:
+        details.append({
+            "type": "success",
+            "message": ".env.example file found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": ".env.example file not found."
+        })
+
+    sensitive_files = [
+        ".env",
+        "credentials.json",
+        "secrets.json",
+        "config.json"
+    ]
+
+    sensitive_found = [
+        file
+        for file in sensitive_files
+        if file in file_paths
+    ]
+
+    if sensitive_found:
+        details.append({
+            "type": "warning",
+            "message": "Potential sensitive configuration files detected."
+        })
+    else:
+        details.append({
+            "type": "success",
+            "message": "No obvious sensitive configuration files detected."
+        })
+
+    return details
+
+
 def calculate_maintainability_score(repository_files):
     score = 0
 
@@ -244,54 +348,114 @@ def calculate_maintainability_score(repository_files):
         for item in repository_files
     ]
 
-    # 1. Check for a README file
-    has_readme = any(
-        path.split("/")[-1] in [
-            "readme.md",
-            "readme.txt",
-            "readme"
-        ]
-        for path in file_paths
-    )
-
-    if has_readme:
+    if "readme.md" in file_paths:
         score += 5
 
-    # 2. Check for documentation folder
-    has_docs_folder = any(
-        path.startswith("docs/")
-        for path in file_paths
-    )
-
-    if has_docs_folder:
+    if ".gitignore" in file_paths:
         score += 5
 
-    # 3. Check for configuration/dependency files
-    maintainable_files = [
-        "package.json",
-        "requirements.txt",
-        "pyproject.toml",
-        "package-lock.json",
-        "yarn.lock"
+    documentation_files = [
+        path
+        for path in file_paths
+        if path.endswith(".md")
     ]
 
-    has_maintainable_file = any(
-        path.split("/")[-1] in maintainable_files
-        for path in file_paths
-    )
-
-    if has_maintainable_file:
+    if len(documentation_files) >= 2:
         score += 5
 
-    # 4. Check for GitHub issue templates or contribution guidelines
-    has_project_guidelines = any(
-        "contributing" in path
-        or "issue_template" in path
-        or "pull_request_template" in path
-        for path in file_paths
-    )
-
-    if has_project_guidelines:
+    if len(file_paths) > 10:
         score += 5
 
     return min(score, 20)
+
+
+# ---------------------------------------------------------
+# TEST DATA
+# ---------------------------------------------------------
+
+if __name__ == "__main__":
+
+    repository_info = {
+        "description": "GitHub Repository Health Analyzer",
+        "language": "Python"
+    }
+
+    readme_content = """
+    # GitHub Health Analyzer
+
+    An application that analyzes GitHub repositories
+    and calculates their overall health score.
+    """
+
+    repository_files = [
+        {"path": "README.md"},
+        {"path": ".gitignore"},
+        {"path": ".env.example"},
+        {"path": "backend/main.py"},
+        {"path": "backend/api.py"},
+        {"path": "backend/services/github.py"},
+        {"path": "frontend/src/App.jsx"},
+        {"path": "frontend/src/components/Dashboard.jsx"},
+        {"path": "tests/test_api.py"},
+        {"path": "tests/test_github.py"},
+        {"path": "requirements.txt"},
+        {"path": "SECURITY.md"}
+    ]
+
+    documentation_score = calculate_documentation_score(
+        repository_info,
+        readme_content
+    )
+
+    testing_score = calculate_testing_score(
+        repository_files
+    )
+
+    code_structure_score = calculate_code_structure_score(
+        repository_files
+    )
+
+    security_score = calculate_security_score(
+        repository_files
+    )
+
+    maintainability_score = calculate_maintainability_score(
+        repository_files
+    )
+
+    total_score = (
+        documentation_score
+        + testing_score
+        + code_structure_score
+        + security_score
+        + maintainability_score
+    )
+
+    print("=" * 50)
+    print("       GITHUB REPOSITORY HEALTH ANALYZER")
+    print("=" * 50)
+
+    print(f"Documentation Score   : {documentation_score}/20")
+    print(f"Testing Score         : {testing_score}/20")
+    print(f"Code Structure Score  : {code_structure_score}/20")
+    print(f"Security Score        : {security_score}/20")
+    print(f"Maintainability Score : {maintainability_score}/20")
+
+    print("-" * 50)
+    print(f"TOTAL HEALTH SCORE    : {total_score}/100")
+    print("=" * 50)
+
+    print("\nDocumentation Details:")
+    for detail in get_documentation_details(
+        repository_info,
+        readme_content
+    ):
+        print(f"[{detail['type'].upper()}] {detail['message']}")
+
+    print("\nTesting Details:")
+    for detail in get_testing_details(repository_files):
+        print(f"[{detail['type'].upper()}] {detail['message']}")
+
+    print("\nSecurity Details:")
+    for detail in get_security_details(repository_files):
+        print(f"[{detail['type'].upper()}] {detail['message']}")
