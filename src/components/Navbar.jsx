@@ -1,13 +1,18 @@
-import Navbar from "./components/Navbar";
-
-function App() {
+```jsx
+function Navbar() {
   return (
-    <>
-      <Navbar />
+    <nav className="navbar">
+      <div className="navbar-logo">
+        GitHub Health Analyzer
+      </div>
 
-      <h1>GitHub Repository Health Analyzer</h1>
-    </>
+      <div className="navbar-links">
+        <a href="#home">Home</a>
+        <a href="#analyzer">Analyzer</a>
+      </div>
+    </nav>
   );
 }
 
-export default App;
+export default Navbar;
+```
