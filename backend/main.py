@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -11,14 +12,15 @@ from github_api import (
 
 from health_analyzer import (
     calculate_documentation_score,
-calculate_testing_score,
-calculate_code_structure_score
+    calculate_testing_score,
+    calculate_code_structure_score,
+    calculate_security_score,
+    calculate_maintainability_score
 )
 
 
-
-
 app = FastAPI()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,8 +34,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 
 
 class RepositoryRequest(BaseModel):
@@ -80,7 +80,6 @@ async def analyze_repository(request: RepositoryRequest):
     username = github_info["username"]
     repository_name = github_info["repository"]
 
-    # Get repository information
     repository_info = await get_repository_info(
         username,
         repository_name
@@ -92,31 +91,37 @@ async def analyze_repository(request: RepositoryRequest):
             detail="GitHub repository not found."
         )
 
-    # Get README
     readme_content = await get_readme(
         username,
         repository_name
     )
 
-    # Calculate documentation score
     documentation_score = calculate_documentation_score(
         repository_info,
         readme_content
     )
 
-    # Get repository files
     repository_files = await get_repository_contents(
         username,
         repository_name
     )
 
-    # Calculate testing score
     testing_score = calculate_testing_score(
         repository_files
     )
+
     code_structure_score = calculate_code_structure_score(
-     repository_files
+        repository_files
     )
+
+    security_score = calculate_security_score(
+        repository_files
+    )
+
+    maintainability_score = calculate_maintainability_score(
+        repository_files
+    )
+
     return {
         "message": "Repository analyzed successfully",
         "repository_url": request.repo_url,
@@ -124,7 +129,9 @@ async def analyze_repository(request: RepositoryRequest):
         "health_score": {
             "documentation": documentation_score,
             "testing": testing_score,
-            "code_structure": code_structure_score
+            "code_structure": code_structure_score,
+            "security": security_score,
+            "maintainability": maintainability_score
         }
     }
 

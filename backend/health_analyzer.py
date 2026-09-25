@@ -164,3 +164,134 @@ def calculate_code_structure_score(repository_files):
         score += 2
 
     return min(score, 20)
+def calculate_security_score(repository_files):
+    score = 0
+
+    if not repository_files:
+        return score
+
+    file_paths = [
+        item.get("path", "").lower()
+        for item in repository_files
+    ]
+
+    # 1. Check for environment files
+    env_files = [
+        ".env",
+        ".env.example"
+    ]
+
+    has_env_file = any(
+        path.split("/")[-1] in env_files
+        for path in file_paths
+    )
+
+    if has_env_file:
+        score += 5
+
+    # 2. Check for security-related configuration
+    security_files = [
+        "security.md",
+        "security.txt",
+        ".github/dependabot.yml",
+        ".github/dependabot.yaml"
+    ]
+
+    has_security_file = any(
+        path in security_files
+        for path in file_paths
+    )
+
+    if has_security_file:
+        score += 5
+
+    # 3. Check for GitHub workflows
+    has_github_workflows = any(
+        path.startswith(".github/workflows/")
+        for path in file_paths
+    )
+
+    if has_github_workflows:
+        score += 5
+
+    # 4. Check for dependency files
+    dependency_files = [
+        "package.json",
+        "requirements.txt",
+        "package-lock.json",
+        "yarn.lock",
+        "pipfile",
+        "poetry.lock"
+    ]
+
+    has_dependency_file = any(
+        path.split("/")[-1] in dependency_files
+        for path in file_paths
+    )
+
+    if has_dependency_file:
+        score += 5
+
+    return min(score, 20)
+def calculate_maintainability_score(repository_files):
+    score = 0
+
+    if not repository_files:
+        return score
+
+    file_paths = [
+        item.get("path", "").lower()
+        for item in repository_files
+    ]
+
+    # 1. Check for a README file
+    has_readme = any(
+        path.split("/")[-1] in [
+            "readme.md",
+            "readme.txt",
+            "readme"
+        ]
+        for path in file_paths
+    )
+
+    if has_readme:
+        score += 5
+
+    # 2. Check for documentation folder
+    has_docs_folder = any(
+        path.startswith("docs/")
+        for path in file_paths
+    )
+
+    if has_docs_folder:
+        score += 5
+
+    # 3. Check for configuration/dependency files
+    maintainable_files = [
+        "package.json",
+        "requirements.txt",
+        "pyproject.toml",
+        "package-lock.json",
+        "yarn.lock"
+    ]
+
+    has_maintainable_file = any(
+        path.split("/")[-1] in maintainable_files
+        for path in file_paths
+    )
+
+    if has_maintainable_file:
+        score += 5
+
+    # 4. Check for GitHub issue templates or contribution guidelines
+    has_project_guidelines = any(
+        "contributing" in path
+        or "issue_template" in path
+        or "pull_request_template" in path
+        for path in file_paths
+    )
+
+    if has_project_guidelines:
+        score += 5
+
+    return min(score, 20)
