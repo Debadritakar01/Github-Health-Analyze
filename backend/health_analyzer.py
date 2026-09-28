@@ -212,38 +212,114 @@ def calculate_code_structure_score(repository_files):
     if not repository_files:
         return score
 
+    # Extract file paths safely
     file_paths = [
-        item.get("path", "").lower()
+        item.get("path", "").lower().strip("/")
         for item in repository_files
+        if isinstance(item, dict)
     ]
 
+    # Remove empty paths
+    file_paths = [path for path in file_paths if path]
+
+    if not file_paths:
+        return score
+
+    
     important_folders = [
-        "src/",
-        "app/",
-        "components/",
-        "backend/",
-        "frontend/",
-        "api/",
-        "utils/",
-        "services/"
+        "src",
+        "app",
+        "components",
+        "backend",
+        "frontend",
+        "api",
+        "utils",
+        "services",
+        "models",
+        "controllers",
     ]
 
-    folders_found = sum(
-        1
-        for folder in important_folders
-        if any(path.startswith(folder) for path in file_paths)
+    folders_found = 0
+
+    for folder in important_folders:
+        folder_exists = any(
+            path.startswith(folder + "/") or f"/{folder}/" in path
+            for path in file_paths
+        )
+
+        if folder_exists:
+            folders_found += 1
+
+    if folders_found >= 4:
+        score += 8
+    elif folders_found >= 2:
+        score += 5
+    elif folders_found == 1:
+        score += 3
+
+    
+    source_extensions = (
+        ".py",
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".java",
+        ".cpp",
+        ".c",
+        ".cs",
+        ".go",
+        ".php",
     )
 
-    if folders_found >= 2:
-        score += 10
-    elif folders_found == 1:
-        score += 5
+    source_files = [
+        path
+        for path in file_paths
+        if path.endswith(source_extensions)
+    ]
 
-    if len(file_paths) > 5:
-        score += 5
+    if len(source_files) >= 10:
+        score += 4
+    elif len(source_files) >= 5:
+        score += 3
+    elif len(source_files) >= 2:
+        score += 2
 
-    if len(file_paths) > 15:
-        score += 5
+   
+    configuration_files = [
+        "package.json",
+        "requirements.txt",
+        "pyproject.toml",
+        "pom.xml",
+        "build.gradle",
+        "vite.config.js",
+        "vite.config.ts",
+        "tsconfig.json",
+    ]
+
+    config_found = any(
+        path.split("/")[-1] in configuration_files
+        for path in file_paths
+    )
+
+    if config_found:
+        score += 3
+
+    
+    root_files = [
+        path
+        for path in file_paths
+        if "/" not in path
+    ]
+
+    nested_files = [
+        path
+        for path in file_paths
+        if "/" in path
+    ]
+
+    if len(file_paths) > 5 and len(nested_files) > 0:
+        score += 3
 
     return min(score, 20)
 
@@ -271,6 +347,229 @@ def calculate_security_score(repository_files):
             score += 5
 
     return min(score, 20)
+def get_code_structure_details(repository_files):
+    details = []
+
+    if not repository_files:
+        details.append({
+            "type": "warning",
+            "message": "Repository files could not be analyzed."
+        })
+        return details
+
+    # Extract file paths safely
+    file_paths = [
+        item.get("path", "").lower().strip("/")
+        for item in repository_files
+        if isinstance(item, dict)
+    ]
+
+    # Remove empty paths
+    file_paths = [
+        path for path in file_paths
+        if path
+    ]
+
+    if not file_paths:
+        details.append({
+            "type": "warning",
+            "message": "No repository files were found."
+        })
+        return details
+
+
+    important_folders = [
+        "src",
+        "app",
+        "components",
+        "backend",
+        "frontend",
+        "api",
+        "utils",
+        "services",
+        "models",
+        "controllers"
+    ]
+
+    folders_found = [
+        folder
+        for folder in important_folders
+        if any(
+            path.startswith(folder + "/")
+            or f"/{folder}/" in path
+            for path in file_paths
+        )
+    ]
+
+    if len(folders_found) >= 4:
+        details.append({
+            "type": "success",
+            "message": (
+                f"Well-organized project structure detected "
+                f"({len(folders_found)} common folders)."
+            )
+        })
+
+    elif len(folders_found) >= 2:
+        details.append({
+            "type": "success",
+            "message": (
+                f"Organized project folders detected "
+                f"({len(folders_found)})."
+            )
+        })
+
+    elif len(folders_found) == 1:
+        details.append({
+            "type": "warning",
+            "message": (
+                f"Only one common project organization folder detected: "
+                f"{folders_found[0]}."
+            )
+        })
+
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No common project organization folders detected."
+        })
+
+    # --------------------------------------------------
+    # 2. Check source/code files
+    # --------------------------------------------------
+    source_extensions = (
+        ".py",
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".java",
+        ".cpp",
+        ".c",
+        ".cs",
+        ".go",
+        ".php"
+    )
+
+    source_files = [
+        path
+        for path in file_paths
+        if path.endswith(source_extensions)
+    ]
+
+    source_count = len(source_files)
+
+    if source_count >= 10:
+        details.append({
+            "type": "success",
+            "message": f"{source_count} source files detected."
+        })
+
+    elif source_count >= 5:
+        details.append({
+            "type": "success",
+            "message": f"{source_count} source files detected."
+        })
+
+    elif source_count >= 2:
+        details.append({
+            "type": "warning",
+            "message": f"Only {source_count} source files detected."
+        })
+
+    else:
+        details.append({
+            "type": "warning",
+            "message": "Very few source files detected."
+        })
+
+    # --------------------------------------------------
+    # 3. Check configuration/project files
+    # --------------------------------------------------
+    configuration_files = [
+        "package.json",
+        "requirements.txt",
+        "pyproject.toml",
+        "pom.xml",
+        "build.gradle",
+        "vite.config.js",
+        "vite.config.ts",
+        "tsconfig.json",
+        "dockerfile",
+        "docker-compose.yml",
+        "docker-compose.yaml",
+        ".env.example"
+    ]
+
+    config_found = [
+        file_name
+        for file_name in configuration_files
+        if any(
+            path.split("/")[-1] == file_name
+            for path in file_paths
+        )
+    ]
+
+    if config_found:
+        details.append({
+            "type": "success",
+            "message": (
+                f"Project configuration files detected "
+                f"({len(config_found)})."
+            )
+        })
+
+    else:
+        details.append({
+            "type": "warning",
+            "message": (
+                "No common project configuration files detected."
+            )
+        })
+
+    # --------------------------------------------------
+    # 4. Check directory organization
+    # --------------------------------------------------
+    root_files = [
+        path
+        for path in file_paths
+        if "/" not in path
+    ]
+
+    nested_files = [
+        path
+        for path in file_paths
+        if "/" in path
+    ]
+
+    if len(file_paths) > 5 and len(nested_files) > 0:
+        details.append({
+            "type": "success",
+            "message": (
+                f"Repository contains organized subdirectories "
+                f"({len(nested_files)} nested files)."
+            )
+        })
+
+    elif len(file_paths) <= 5:
+        details.append({
+            "type": "warning",
+            "message": (
+                "Repository is small, so directory organization "
+                "could not be fully evaluated."
+            )
+        })
+
+    else:
+        details.append({
+            "type": "warning",
+            "message": (
+                f"Most repository files are located in the root directory "
+                f"({len(root_files)} root files)."
+            )
+        })
+
+    return details
 
 
 def get_security_details(repository_files):

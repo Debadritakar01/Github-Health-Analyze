@@ -80,9 +80,14 @@ healthScore?.security?.details ?? [];
 const overallScore =
 documentationScore +
 testingScore +
-(healthScore?.code_structure ?? 0) +
+(healthScore?.code_structure?.score ?? 0) +
 securityScore +
 (healthScore?.maintainability ?? 0);
+const codeStructureScore =
+  healthScore?.code_structure?.score ?? 0;
+
+const codeStructureDetails =
+  healthScore?.code_structure?.details ?? [];
 
 return ( <main id="home" className="home">
 

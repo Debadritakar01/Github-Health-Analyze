@@ -15,6 +15,7 @@ from health_analyzer import (
     get_documentation_details,
     calculate_testing_score,
     calculate_code_structure_score,
+    get_code_structure_details,
     calculate_security_score,
     get_security_details,
     calculate_maintainability_score
@@ -120,6 +121,9 @@ async def analyze_repository(request: RepositoryRequest):
     code_structure_score = calculate_code_structure_score(
         repository_files
     )
+    code_structure_details = get_code_structure_details(
+    repository_files
+   )
 
     security_score = calculate_security_score(
         repository_files
@@ -148,8 +152,10 @@ async def analyze_repository(request: RepositoryRequest):
 
             "testing": testing_score,
 
-            "code_structure": code_structure_score,
-
+            "code_structure": {
+                "score": code_structure_score,
+                "details": code_structure_details
+            },
             "security": {
                 "score": security_score,
                 "details": security_details
