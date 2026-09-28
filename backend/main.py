@@ -13,12 +13,18 @@ from github_api import (
 from health_analyzer import (
     calculate_documentation_score,
     get_documentation_details,
+
     calculate_testing_score,
+    get_testing_details,
+
     calculate_code_structure_score,
     get_code_structure_details,
+
     calculate_security_score,
     get_security_details,
-    calculate_maintainability_score
+
+    calculate_maintainability_score,
+    get_maintainability_details
 )
 
 
@@ -117,6 +123,9 @@ async def analyze_repository(request: RepositoryRequest):
     testing_score = calculate_testing_score(
         repository_files
     )
+    testing_details = get_testing_details(
+    repository_files
+    )
 
     code_structure_score = calculate_code_structure_score(
         repository_files
@@ -134,7 +143,11 @@ async def analyze_repository(request: RepositoryRequest):
     )
 
     maintainability_score = calculate_maintainability_score(
-        repository_files
+    repository_files
+    )
+
+    maintainability_details = get_maintainability_details(
+    repository_files
     )
 
     return {
@@ -150,7 +163,10 @@ async def analyze_repository(request: RepositoryRequest):
                 "details": documentation_details
             },
 
-            "testing": testing_score,
+            "testing": {
+              "score": testing_score,
+              "details": testing_details
+            },
 
             "code_structure": {
                 "score": code_structure_score,
@@ -161,6 +177,9 @@ async def analyze_repository(request: RepositoryRequest):
                 "details": security_details
             },
 
-            "maintainability": maintainability_score
+            "maintainability": {
+                "score": maintainability_score,
+                "details": maintainability_details
+            }
         }
     }

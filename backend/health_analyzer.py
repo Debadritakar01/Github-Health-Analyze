@@ -56,29 +56,66 @@ def get_documentation_details(repository_info, readme_content):
 
 
 def calculate_testing_score(repository_files):
+
     score = 0
 
     if not repository_files:
         return score
 
     file_paths = [
-        item.get("path", "").lower()
+        item.get("path", "").lower().strip("/")
         for item in repository_files
+        if isinstance(item, dict)
     ]
 
-    testing_folders = [
+    # --------------------------------------------------
+    # 1. Check for testing directories
+    # --------------------------------------------------
+
+    testing_directories = [
         "test/",
         "tests/",
         "__tests__/"
     ]
 
-    has_testing_folder = any(
-        any(path.startswith(folder) for folder in testing_folders)
+    has_testing_directory = any(
+        path.startswith(directory)
         for path in file_paths
+        for directory in testing_directories
     )
 
-    if has_testing_folder:
-        score += 10
+    if has_testing_directory:
+        score += 8
+
+    # --------------------------------------------------
+    # 2. Detect test files
+    # --------------------------------------------------
+
+    test_file_patterns = [
+        ".test.",
+        ".spec.",
+        "_test.",
+        "test_"
+    ]
+
+    test_files = [
+        path
+        for path in file_paths
+        if any(pattern in path for pattern in test_file_patterns)
+    ]
+
+    if len(test_files) >= 5:
+        score += 7
+
+    elif len(test_files) >= 2:
+        score += 5
+
+    elif len(test_files) == 1:
+        score += 3
+
+    # --------------------------------------------------
+    # 3. Detect testing frameworks
+    # --------------------------------------------------
 
     testing_frameworks = [
         "pytest",
@@ -89,32 +126,21 @@ def calculate_testing_score(repository_files):
         "unittest"
     ]
 
-    framework_found = any(
-        any(framework in path for framework in testing_frameworks)
+    framework_detected = any(
+        framework in path
         for path in file_paths
+        for framework in testing_frameworks
     )
 
-    if framework_found:
+    if framework_detected:
         score += 5
 
-    test_files = [
-        path
-        for path in file_paths
-        if (
-            "test_" in path
-            or "_test." in path
-            or ".test." in path
-            or ".spec." in path
-        )
-    ]
-
-    if len(test_files) >= 2:
-        score += 5
-
+    # Maximum score = 20
     return min(score, 20)
 
 
 def get_testing_details(repository_files):
+
     details = []
 
     if not repository_files:
@@ -125,25 +151,37 @@ def get_testing_details(repository_files):
         return details
 
     file_paths = [
-        item.get("path", "").lower()
+        item.get("path", "").lower().strip("/")
         for item in repository_files
+        if isinstance(item, dict)
     ]
 
-    testing_folders = [
+    # --------------------------------------------------
+    # Testing directories
+    # --------------------------------------------------
+
+    testing_directories = [
         "test/",
         "tests/",
         "__tests__/"
     ]
 
-    has_testing_folder = any(
-        any(path.startswith(folder) for folder in testing_folders)
-        for path in file_paths
-    )
+    detected_directories = [
+        directory
+        for directory in testing_directories
+        if any(
+            path.startswith(directory)
+            for path in file_paths
+        )
+    ]
 
-    if has_testing_folder:
+    if detected_directories:
         details.append({
             "type": "success",
-            "message": "Testing directory found."
+            "message": (
+                "Testing directory found: "
+                + ", ".join(detected_directories)
+            )
         })
     else:
         details.append({
@@ -151,6 +189,40 @@ def get_testing_details(repository_files):
             "message": "No dedicated testing directory found."
         })
 
+    # --------------------------------------------------
+    # Test files
+    # --------------------------------------------------
+
+    test_file_patterns = [
+        ".test.",
+        ".spec.",
+        "_test.",
+        "test_"
+    ]
+
+    test_files = [
+        path
+        for path in file_paths
+        if any(pattern in path for pattern in test_file_patterns)
+    ]
+
+    if test_files:
+        details.append({
+            "type": "success",
+            "message": (
+                f"{len(test_files)} test file(s) detected."
+            )
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No test files detected."
+        })
+
+    # --------------------------------------------------
+    # Testing frameworks
+    # --------------------------------------------------
+
     testing_frameworks = [
         "pytest",
         "jest",
@@ -160,283 +232,86 @@ def get_testing_details(repository_files):
         "unittest"
     ]
 
-    framework_found = any(
-        any(framework in path for framework in testing_frameworks)
-        for path in file_paths
-    )
-
-    if framework_found:
-        details.append({
-            "type": "success",
-            "message": "Testing framework detected."
-        })
-    else:
-        details.append({
-            "type": "warning",
-            "message": "No recognized testing framework detected."
-        })
-
-    test_files = [
-        path
-        for path in file_paths
-        if (
-            "test_" in path
-            or "_test." in path
-            or ".test." in path
-            or ".spec." in path
+    detected_frameworks = [
+        framework
+        for framework in testing_frameworks
+        if any(
+            framework in path
+            for path in file_paths
         )
     ]
 
-    if len(test_files) >= 2:
+    if detected_frameworks:
         details.append({
             "type": "success",
-            "message": f"{len(test_files)} test files detected."
-        })
-    elif len(test_files) == 1:
-        details.append({
-            "type": "warning",
-            "message": "Only one test file detected."
+            "message": (
+                "Testing framework detected: "
+                + ", ".join(detected_frameworks)
+            )
         })
     else:
         details.append({
             "type": "warning",
-            "message": "No test files detected."
+            "message": "No common testing framework detected."
         })
 
     return details
 
 
 def calculate_code_structure_score(repository_files):
-    score = 0
 
-    if not repository_files:
-        return score
-
-    # Extract file paths safely
-    file_paths = [
-        item.get("path", "").lower().strip("/")
-        for item in repository_files
-        if isinstance(item, dict)
-    ]
-
-    # Remove empty paths
-    file_paths = [path for path in file_paths if path]
-
-    if not file_paths:
-        return score
-
-    
-    important_folders = [
-        "src",
-        "app",
-        "components",
-        "backend",
-        "frontend",
-        "api",
-        "utils",
-        "services",
-        "models",
-        "controllers",
-    ]
-
-    folders_found = 0
-
-    for folder in important_folders:
-        folder_exists = any(
-            path.startswith(folder + "/") or f"/{folder}/" in path
-            for path in file_paths
-        )
-
-        if folder_exists:
-            folders_found += 1
-
-    if folders_found >= 4:
-        score += 8
-    elif folders_found >= 2:
-        score += 5
-    elif folders_found == 1:
-        score += 3
-
-    
-    source_extensions = (
-        ".py",
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".java",
-        ".cpp",
-        ".c",
-        ".cs",
-        ".go",
-        ".php",
-    )
-
-    source_files = [
-        path
-        for path in file_paths
-        if path.endswith(source_extensions)
-    ]
-
-    if len(source_files) >= 10:
-        score += 4
-    elif len(source_files) >= 5:
-        score += 3
-    elif len(source_files) >= 2:
-        score += 2
-
-   
-    configuration_files = [
-        "package.json",
-        "requirements.txt",
-        "pyproject.toml",
-        "pom.xml",
-        "build.gradle",
-        "vite.config.js",
-        "vite.config.ts",
-        "tsconfig.json",
-    ]
-
-    config_found = any(
-        path.split("/")[-1] in configuration_files
-        for path in file_paths
-    )
-
-    if config_found:
-        score += 3
-
-    
-    root_files = [
-        path
-        for path in file_paths
-        if "/" not in path
-    ]
-
-    nested_files = [
-        path
-        for path in file_paths
-        if "/" in path
-    ]
-
-    if len(file_paths) > 5 and len(nested_files) > 0:
-        score += 3
-
-    return min(score, 20)
-
-
-def calculate_security_score(repository_files):
     score = 0
 
     if not repository_files:
         return score
 
     file_paths = [
-        item.get("path", "").lower()
-        for item in repository_files
-    ]
-
-    security_files = [
-        ".gitignore",
-        ".env.example",
-        "security.md",
-        "security.txt"
-    ]
-
-    for security_file in security_files:
-        if security_file in file_paths:
-            score += 5
-
-    return min(score, 20)
-def get_code_structure_details(repository_files):
-    details = []
-
-    if not repository_files:
-        details.append({
-            "type": "warning",
-            "message": "Repository files could not be analyzed."
-        })
-        return details
-
-    # Extract file paths safely
-    file_paths = [
         item.get("path", "").lower().strip("/")
         for item in repository_files
         if isinstance(item, dict)
     ]
 
-    # Remove empty paths
-    file_paths = [
-        path for path in file_paths
-        if path
-    ]
-
-    if not file_paths:
-        details.append({
-            "type": "warning",
-            "message": "No repository files were found."
-        })
-        return details
-
+    # --------------------------------------------------
+    # 1. Check project folders
+    # --------------------------------------------------
 
     important_folders = [
-        "src",
-        "app",
-        "components",
-        "backend",
-        "frontend",
-        "api",
-        "utils",
-        "services",
-        "models",
-        "controllers"
+        "src/",
+        "app/",
+        "components/",
+        "backend/",
+        "frontend/",
+        "api/",
+        "utils/",
+        "services/",
+        "models/",
+        "controllers/"
     ]
 
-    folders_found = [
+    organized_folders = [
         folder
         for folder in important_folders
         if any(
-            path.startswith(folder + "/")
-            or f"/{folder}/" in path
+            path.startswith(folder)
             for path in file_paths
         )
     ]
 
-    if len(folders_found) >= 4:
-        details.append({
-            "type": "success",
-            "message": (
-                f"Well-organized project structure detected "
-                f"({len(folders_found)} common folders)."
-            )
-        })
+    folder_count = len(organized_folders)
 
-    elif len(folders_found) >= 2:
-        details.append({
-            "type": "success",
-            "message": (
-                f"Organized project folders detected "
-                f"({len(folders_found)})."
-            )
-        })
+    if folder_count >= 5:
+        score += 7
 
-    elif len(folders_found) == 1:
-        details.append({
-            "type": "warning",
-            "message": (
-                f"Only one common project organization folder detected: "
-                f"{folders_found[0]}."
-            )
-        })
+    elif folder_count >= 3:
+        score += 5
 
-    else:
-        details.append({
-            "type": "warning",
-            "message": "No common project organization folders detected."
-        })
+    elif folder_count >= 1:
+        score += 3
 
     # --------------------------------------------------
-    # 2. Check source/code files
+    # 2. Count source files
     # --------------------------------------------------
+
     source_extensions = (
         ".py",
         ".js",
@@ -444,8 +319,8 @@ def get_code_structure_details(repository_files):
         ".ts",
         ".tsx",
         ".java",
-        ".cpp",
         ".c",
+        ".cpp",
         ".cs",
         ".go",
         ".php"
@@ -459,34 +334,20 @@ def get_code_structure_details(repository_files):
 
     source_count = len(source_files)
 
-    if source_count >= 10:
-        details.append({
-            "type": "success",
-            "message": f"{source_count} source files detected."
-        })
+    if source_count >= 15:
+        score += 5
 
-    elif source_count >= 5:
-        details.append({
-            "type": "success",
-            "message": f"{source_count} source files detected."
-        })
+    elif source_count >= 8:
+        score += 4
 
-    elif source_count >= 2:
-        details.append({
-            "type": "warning",
-            "message": f"Only {source_count} source files detected."
-        })
-
-    else:
-        details.append({
-            "type": "warning",
-            "message": "Very few source files detected."
-        })
+    elif source_count >= 3:
+        score += 2
 
     # --------------------------------------------------
-    # 3. Check configuration/project files
+    # 3. Configuration files
     # --------------------------------------------------
-    configuration_files = [
+
+    config_files = [
         "package.json",
         "requirements.txt",
         "pyproject.toml",
@@ -494,47 +355,21 @@ def get_code_structure_details(repository_files):
         "build.gradle",
         "vite.config.js",
         "vite.config.ts",
-        "tsconfig.json",
-        "dockerfile",
-        "docker-compose.yml",
-        "docker-compose.yaml",
-        ".env.example"
+        "tsconfig.json"
     ]
 
-    config_found = [
-        file_name
-        for file_name in configuration_files
-        if any(
-            path.split("/")[-1] == file_name
-            for path in file_paths
-        )
+    detected_configs = [
+        config
+        for config in config_files
+        if config in file_paths
     ]
 
-    if config_found:
-        details.append({
-            "type": "success",
-            "message": (
-                f"Project configuration files detected "
-                f"({len(config_found)})."
-            )
-        })
-
-    else:
-        details.append({
-            "type": "warning",
-            "message": (
-                "No common project configuration files detected."
-            )
-        })
+    if detected_configs:
+        score += 4
 
     # --------------------------------------------------
-    # 4. Check directory organization
+    # 4. Nested project structure
     # --------------------------------------------------
-    root_files = [
-        path
-        for path in file_paths
-        if "/" not in path
-    ]
 
     nested_files = [
         path
@@ -542,37 +377,63 @@ def get_code_structure_details(repository_files):
         if "/" in path
     ]
 
-    if len(file_paths) > 5 and len(nested_files) > 0:
-        details.append({
-            "type": "success",
-            "message": (
-                f"Repository contains organized subdirectories "
-                f"({len(nested_files)} nested files)."
-            )
-        })
+    if len(nested_files) >= 5:
+        score += 4
 
-    elif len(file_paths) <= 5:
-        details.append({
-            "type": "warning",
-            "message": (
-                "Repository is small, so directory organization "
-                "could not be fully evaluated."
-            )
-        })
-
-    else:
-        details.append({
-            "type": "warning",
-            "message": (
-                f"Most repository files are located in the root directory "
-                f"({len(root_files)} root files)."
-            )
-        })
-
-    return details
+    # Maximum score = 20
+    return min(score, 20)
 
 
-def get_security_details(repository_files):
+def calculate_security_score(repository_files):
+
+    score = 0
+
+    if not repository_files:
+        return score
+
+    file_paths = [
+        item.get("path", "").lower().strip("/")
+        for item in repository_files
+        if isinstance(item, dict)
+    ]
+
+    # Security configuration files
+    if ".gitignore" in file_paths:
+        score += 5
+
+    if ".env.example" in file_paths:
+        score += 5
+
+    if "security.md" in file_paths or "security.txt" in file_paths:
+        score += 5
+
+    # Check for sensitive files
+    sensitive_files = [
+        ".env",
+        "credentials.json",
+        "secrets.json",
+        "secret.json",
+        "private.key",
+        "private.pem"
+    ]
+
+    sensitive_files_found = [
+        path
+        for path in file_paths
+        if path in sensitive_files
+    ]
+
+    # Give points when no sensitive files are exposed
+    if not sensitive_files_found:
+        score += 5
+
+    # Reduce score if sensitive files are found
+    if sensitive_files_found:
+        score -= min(len(sensitive_files_found) * 5, 15)
+
+    return max(0, min(score, 20))
+def get_code_structure_details(repository_files):
+
     details = []
 
     if not repository_files:
@@ -583,9 +444,339 @@ def get_security_details(repository_files):
         return details
 
     file_paths = [
-        item.get("path", "").lower()
+        item.get("path", "").lower().strip("/")
         for item in repository_files
+        if isinstance(item, dict)
     ]
+
+    # --------------------------------------------------
+    # Project folders
+    # --------------------------------------------------
+
+    important_folders = [
+        "src/",
+        "app/",
+        "components/",
+        "backend/",
+        "frontend/",
+        "api/",
+        "utils/",
+        "services/",
+        "models/",
+        "controllers/"
+    ]
+
+    organized_folders = [
+        folder
+        for folder in important_folders
+        if any(
+            path.startswith(folder)
+            for path in file_paths
+        )
+    ]
+
+    if organized_folders:
+        details.append({
+            "type": "success",
+            "message": (
+                "Organized folders detected: "
+                + ", ".join(organized_folders)
+            )
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No common project folders detected."
+        })
+
+    # --------------------------------------------------
+    # Source files
+    # --------------------------------------------------
+
+    source_extensions = (
+        ".py",
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".java",
+        ".c",
+        ".cpp",
+        ".cs",
+        ".go",
+        ".php"
+    )
+
+    source_files = [
+        path
+        for path in file_paths
+        if path.endswith(source_extensions)
+    ]
+
+    details.append({
+        "type": "success" if source_files else "warning",
+        "message": (
+            f"{len(source_files)} source code file(s) detected."
+        )
+    })
+
+    # --------------------------------------------------
+    # Configuration files
+    # --------------------------------------------------
+
+    config_files = [
+        "package.json",
+        "requirements.txt",
+        "pyproject.toml",
+        "pom.xml",
+        "build.gradle",
+        "vite.config.js",
+        "vite.config.ts",
+        "tsconfig.json"
+    ]
+
+    detected_configs = [
+        config
+        for config in config_files
+        if config in file_paths
+    ]
+
+    if detected_configs:
+        details.append({
+            "type": "success",
+            "message": (
+                "Configuration files detected: "
+                + ", ".join(detected_configs)
+            )
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No common configuration files detected."
+        })
+
+    # --------------------------------------------------
+    # Nested structure
+    # --------------------------------------------------
+
+    nested_files = [
+        path
+        for path in file_paths
+        if "/" in path
+    ]
+
+    if len(nested_files) >= 5:
+        details.append({
+            "type": "success",
+            "message": (
+                f"{len(nested_files)} files are inside directories, "
+                "indicating organized project structure."
+            )
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "Limited directory nesting detected."
+        })
+
+    return details
+
+def get_security_details(repository_files):
+
+    details = []
+
+    if not repository_files:
+        details.append({
+            "type": "warning",
+            "message": "Repository files could not be analyzed."
+        })
+        return details
+
+    file_paths = [
+        item.get("path", "").lower().strip("/")
+        for item in repository_files
+        if isinstance(item, dict)
+    ]
+
+    # Check .gitignore
+    if ".gitignore" in file_paths:
+        details.append({
+            "type": "success",
+            "message": ".gitignore file found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": ".gitignore file not found."
+        })
+
+    # Check .env.example
+    if ".env.example" in file_paths:
+        details.append({
+            "type": "success",
+            "message": ".env.example file found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": ".env.example file not found."
+        })
+
+    # Check security documentation
+    security_docs = [
+        "security.md",
+        "security.txt"
+    ]
+
+    if any(path in file_paths for path in security_docs):
+        details.append({
+            "type": "success",
+            "message": "Security documentation found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "Security documentation not found."
+        })
+
+    # Check sensitive files
+    sensitive_files = [
+        ".env",
+        "credentials.json",
+        "secrets.json",
+        "secret.json",
+        "private.key",
+        "private.pem"
+    ]
+
+    sensitive_files_found = [
+        path
+        for path in file_paths
+        if path in sensitive_files
+    ]
+
+    if sensitive_files_found:
+        details.append({
+            "type": "warning",
+            "message": (
+                "Potentially sensitive files detected: "
+                + ", ".join(sensitive_files_found)
+            )
+        })
+    else:
+        details.append({
+            "type": "success",
+            "message": "No common sensitive files detected."
+        })
+
+    return details
+
+
+def calculate_maintainability_score(repository_files):
+
+    score = 0
+
+    if not repository_files:
+        return score
+
+    file_paths = [
+        item.get("path", "").lower().strip("/")
+        for item in repository_files
+        if isinstance(item, dict)
+    ]
+
+    # --------------------------------------------------
+    # 1. README
+    # --------------------------------------------------
+
+    if "readme.md" in file_paths:
+        score += 5
+
+    # --------------------------------------------------
+    # 2. Git ignore
+    # --------------------------------------------------
+
+    if ".gitignore" in file_paths:
+        score += 5
+
+    # --------------------------------------------------
+    # 3. Documentation
+    # --------------------------------------------------
+
+    documentation_files = [
+        path
+        for path in file_paths
+        if path.endswith(".md")
+    ]
+
+    if len(documentation_files) >= 2:
+        score += 5
+
+    # --------------------------------------------------
+    # 4. Project organization
+    # --------------------------------------------------
+
+    important_folders = [
+        "src/",
+        "app/",
+        "components/",
+        "backend/",
+        "frontend/",
+        "api/",
+        "utils/",
+        "services/",
+        "models/",
+        "controllers/"
+    ]
+
+    organized_folders = [
+        folder
+        for folder in important_folders
+        if any(
+            path.startswith(folder)
+            for path in file_paths
+        )
+    ]
+
+    if len(organized_folders) >= 2:
+        score += 5
+
+    return min(score, 20)
+def get_maintainability_details(repository_files):
+
+    details = []
+
+    if not repository_files:
+        details.append({
+            "type": "warning",
+            "message": "Repository files could not be analyzed."
+        })
+        return details
+
+    file_paths = [
+        item.get("path", "").lower().strip("/")
+        for item in repository_files
+        if isinstance(item, dict)
+    ]
+
+    # --------------------------------------------------
+    # README
+    # --------------------------------------------------
+
+    if "readme.md" in file_paths:
+        details.append({
+            "type": "success",
+            "message": "README file found."
+        })
+    else:
+        details.append({
+            "type": "warning",
+            "message": "README file not found."
+        })
+
+    # --------------------------------------------------
+    # Git ignore
+    # --------------------------------------------------
 
     if ".gitignore" in file_paths:
         details.append({
@@ -598,60 +789,9 @@ def get_security_details(repository_files):
             "message": ".gitignore file not found."
         })
 
-    if ".env.example" in file_paths:
-        details.append({
-            "type": "success",
-            "message": ".env.example file found."
-        })
-    else:
-        details.append({
-            "type": "warning",
-            "message": ".env.example file not found."
-        })
-
-    sensitive_files = [
-        ".env",
-        "credentials.json",
-        "secrets.json",
-        "config.json"
-    ]
-
-    sensitive_found = [
-        file
-        for file in sensitive_files
-        if file in file_paths
-    ]
-
-    if sensitive_found:
-        details.append({
-            "type": "warning",
-            "message": "Potential sensitive configuration files detected."
-        })
-    else:
-        details.append({
-            "type": "success",
-            "message": "No obvious sensitive configuration files detected."
-        })
-
-    return details
-
-
-def calculate_maintainability_score(repository_files):
-    score = 0
-
-    if not repository_files:
-        return score
-
-    file_paths = [
-        item.get("path", "").lower()
-        for item in repository_files
-    ]
-
-    if "readme.md" in file_paths:
-        score += 5
-
-    if ".gitignore" in file_paths:
-        score += 5
+    # --------------------------------------------------
+    # Documentation
+    # --------------------------------------------------
 
     documentation_files = [
         path
@@ -660,101 +800,69 @@ def calculate_maintainability_score(repository_files):
     ]
 
     if len(documentation_files) >= 2:
-        score += 5
+        details.append({
+            "type": "success",
+            "message": (
+                f"{len(documentation_files)} documentation files detected."
+            )
+        })
 
-    if len(file_paths) > 10:
-        score += 5
+    elif len(documentation_files) == 1:
+        details.append({
+            "type": "warning",
+            "message": "Only one documentation file detected."
+        })
 
-    return min(score, 20)
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No documentation files detected."
+        })
 
+    # --------------------------------------------------
+    # Project organization
+    # --------------------------------------------------
 
-# ---------------------------------------------------------
-# TEST DATA
-# ---------------------------------------------------------
-
-if __name__ == "__main__":
-
-    repository_info = {
-        "description": "GitHub Repository Health Analyzer",
-        "language": "Python"
-    }
-
-    readme_content = """
-    # GitHub Health Analyzer
-
-    An application that analyzes GitHub repositories
-    and calculates their overall health score.
-    """
-
-    repository_files = [
-        {"path": "README.md"},
-        {"path": ".gitignore"},
-        {"path": ".env.example"},
-        {"path": "backend/main.py"},
-        {"path": "backend/api.py"},
-        {"path": "backend/services/github.py"},
-        {"path": "frontend/src/App.jsx"},
-        {"path": "frontend/src/components/Dashboard.jsx"},
-        {"path": "tests/test_api.py"},
-        {"path": "tests/test_github.py"},
-        {"path": "requirements.txt"},
-        {"path": "SECURITY.md"}
+    important_folders = [
+        "src/",
+        "app/",
+        "components/",
+        "backend/",
+        "frontend/",
+        "api/",
+        "utils/",
+        "services/",
+        "models/",
+        "controllers/"
     ]
 
-    documentation_score = calculate_documentation_score(
-        repository_info,
-        readme_content
-    )
+    organized_folders = [
+        folder
+        for folder in important_folders
+        if any(
+            path.startswith(folder)
+            for path in file_paths
+        )
+    ]
 
-    testing_score = calculate_testing_score(
-        repository_files
-    )
+    if len(organized_folders) >= 2:
+        details.append({
+            "type": "success",
+            "message": (
+                f"{len(organized_folders)} organized project folders detected."
+            )
+        })
 
-    code_structure_score = calculate_code_structure_score(
-        repository_files
-    )
+    elif len(organized_folders) == 1:
+        details.append({
+            "type": "warning",
+            "message": "Only one organized project folder detected."
+        })
 
-    security_score = calculate_security_score(
-        repository_files
-    )
+    else:
+        details.append({
+            "type": "warning",
+            "message": "No common project organization folders detected."
+        })
 
-    maintainability_score = calculate_maintainability_score(
-        repository_files
-    )
-
-    total_score = (
-        documentation_score
-        + testing_score
-        + code_structure_score
-        + security_score
-        + maintainability_score
-    )
-
-    print("=" * 50)
-    print("       GITHUB REPOSITORY HEALTH ANALYZER")
-    print("=" * 50)
-
-    print(f"Documentation Score   : {documentation_score}/20")
-    print(f"Testing Score         : {testing_score}/20")
-    print(f"Code Structure Score  : {code_structure_score}/20")
-    print(f"Security Score        : {security_score}/20")
-    print(f"Maintainability Score : {maintainability_score}/20")
-
-    print("-" * 50)
-    print(f"TOTAL HEALTH SCORE    : {total_score}/100")
-    print("=" * 50)
-
-    print("\nDocumentation Details:")
-    for detail in get_documentation_details(
-        repository_info,
-        readme_content
-    ):
-        print(f"[{detail['type'].upper()}] {detail['message']}")
-
-    print("\nTesting Details:")
-    for detail in get_testing_details(repository_files):
-        print(f"[{detail['type'].upper()}] {detail['message']}")
-
-    print("\nSecurity Details:")
-    for detail in get_security_details(repository_files):
-        print(f"[{detail['type'].upper()}] {detail['message']}")
+    return details
