@@ -9,51 +9,42 @@ function Home() {
   const [error, setError] = useState("");
 
   const analyzeRepository = async () => {
-    if (!repoUrl.trim()) {
-      setError("Please enter a GitHub repository URL.");
-      return;
+  if (!repoUrl.trim()) {
+    setError("Please enter a GitHub repository URL.");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+  setRepository(null);
+  setHealthScore(null);
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        repo_url: repoUrl,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to analyze repository.");
     }
 
-    setLoading(true);
-    setError("");
-    setRepository(null);
-    setHealthScore(null);
+    setRepository(data.repository);
+    setHealthScore(data.health_score);
 
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            repo_url: repoUrl,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.detail || "Something went wrong."
-        );
-      }
-
-      setRepository(data.repository);
-      setHealthScore(data.health_score);
-    } catch (err) {
-      console.error("Analyze error:", err);
-
-      setError(
-        err.message ||
-          "Unable to connect to the backend. Make sure FastAPI is running."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // =========================
   // Documentation
@@ -109,12 +100,7 @@ function Home() {
   // Overall Score
   // =========================
 
-  const overallScore =
-    documentationScore +
-    testingScore +
-    codeStructureScore +
-    securityScore +
-    maintainabilityScore;
+  const overallScore = healthScore?.overall ?? 0;
 
   return (
     <main id="home" className="home">
