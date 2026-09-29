@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 function Home() {
@@ -511,9 +512,11 @@ function Home() {
                     >
 
                       <span className="documentation-icon">
+
                         {detail.type === "success"
                           ? "✓"
                           : "⚠"}
+
                       </span>
 
                       <span>
@@ -565,9 +568,11 @@ function Home() {
                     >
 
                       <span className="testing-icon">
+
                         {detail.type === "success"
                           ? "✓"
                           : "⚠"}
+
                       </span>
 
                       <span>
@@ -619,9 +624,11 @@ function Home() {
                     >
 
                       <span className="code-structure-icon">
+
                         {detail.type === "success"
                           ? "✓"
                           : "⚠"}
+
                       </span>
 
                       <span>
@@ -673,9 +680,11 @@ function Home() {
                     >
 
                       <span className="security-icon">
+
                         {detail.type === "success"
                           ? "✓"
                           : "⚠"}
+
                       </span>
 
                       <span>
@@ -727,9 +736,11 @@ function Home() {
                     >
 
                       <span className="maintainability-icon">
+
                         {detail.type === "success"
                           ? "✓"
                           : "⚠"}
+
                       </span>
 
                       <span>
@@ -750,100 +761,137 @@ function Home() {
 
           {/* =========================
               REPOSITORY INFORMATION
+              UPDATED SECTION
           ========================= */}
 
-          <h2>
-            Repository Information
-          </h2>
+          <div className="repository-section">
 
-          <div className="repository-card">
+            <div className="section-title">
 
-            <h3>
-              {repository.name}
-            </h3>
+              <h2>
+                Repository Information
+              </h2>
 
-            <p className="full-name">
-              {repository.full_name}
-            </p>
+              <p>
+                Details about the analyzed GitHub repository
+              </p>
 
-            <p>
-              {repository.description ||
-                "No description available."}
-            </p>
+            </div>
 
 
-            {/* Repository Statistics */}
+            <div className="repository-info-grid">
 
-            <div className="stats">
+              {/* Repository Name */}
 
-              <div className="stat-card">
+              <div className="repository-info-card">
+
+                <span className="info-label">
+                  Repository
+                </span>
+
+                <strong>
+                  {repository.name || "N/A"}
+                </strong>
+
+              </div>
+
+
+              {/* Language */}
+
+              <div className="repository-info-card">
+
+                <span className="info-label">
+                  Language
+                </span>
 
                 <strong>
                   {repository.language || "N/A"}
                 </strong>
 
-                <span>
-                  Language
-                </span>
-
               </div>
 
 
-              <div className="stat-card">
+              {/* Stars */}
 
-                <strong>
-                  {repository.stars}
-                </strong>
+              <div className="repository-info-card">
 
-                <span>
+                <span className="info-label">
                   Stars
                 </span>
 
+                <strong>
+                  {repository.stars ?? 0}
+                </strong>
+
               </div>
 
 
-              <div className="stat-card">
+              {/* Forks */}
 
-                <strong>
-                  {repository.forks}
-                </strong>
+              <div className="repository-info-card">
 
-                <span>
+                <span className="info-label">
                   Forks
                 </span>
 
+                <strong>
+                  {repository.forks ?? 0}
+                </strong>
+
               </div>
 
 
-              <div className="stat-card">
+              {/* Open Issues */}
 
-                <strong>
-                  {repository.open_issues}
-                </strong>
+              <div className="repository-info-card">
 
-                <span>
+                <span className="info-label">
                   Open Issues
                 </span>
+
+                <strong>
+                  {repository.open_issues ?? 0}
+                </strong>
+
+              </div>
+
+
+              {/* Default Branch */}
+
+              <div className="repository-info-card">
+
+                <span className="info-label">
+                  Default Branch
+                </span>
+
+                <strong>
+                  {repository.default_branch || "N/A"}
+                </strong>
 
               </div>
 
             </div>
 
 
-            {/* Repository Details */}
+            {/* Repository Description */}
 
-            <div className="repository-details">
+            <div className="repository-description">
+
+              <span className="info-label">
+                Description
+              </span>
 
               <p>
-
-                <strong>
-                  Default Branch:
-                </strong>{" "}
-
-                {repository.default_branch ||
-                  "N/A"}
-
+                {repository.description ||
+                  "No repository description available."}
               </p>
+
+            </div>
+
+
+            {/* GitHub Repository Link */}
+
+            <div className="repository-link">
 
               <a
                 href={repoUrl}
