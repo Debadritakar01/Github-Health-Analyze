@@ -8,9 +8,9 @@
 
 The user provides a GitHub repository URL, for example:
 
-```text
+
 https://github.com/username/repository
-```
+
 
 The application collects repository information through the GitHub API, analyzes the repository structure and project files, calculates health metrics, and presents the results through a React dashboard.
 
@@ -28,11 +28,11 @@ The application evaluates the repository using areas such as:
 * **Security**
 * **Maintainability**
 
-These individual metrics will contribute to an overall Repository Health Score out of 100.
+These individual metrics contribute to an overall Repository Health Score out of 100.
 
 ### Technology Stack
 
-**Frontend**
+#### Frontend
 
 * React
 * Vite
@@ -40,7 +40,7 @@ These individual metrics will contribute to an overall Repository Health Score o
 * CSS
 * Recharts *(planned)*
 
-**Backend**
+#### Backend
 
 * Python
 * FastAPI
@@ -48,18 +48,18 @@ These individual metrics will contribute to an overall Repository Health Score o
 * HTTPX
 * Pydantic
 
-**External API**
+#### External API
 
 * GitHub REST API
 
-**Planned Analysis Tools**
+#### Planned Analysis Tools
 
 * Radon for Python code complexity
 * Bandit for Python security analysis
 * Dependency analysis
 * GitHub repository and commit data
 
-**Planned Database**
+#### Planned Database
 
 * PostgreSQL
 
@@ -125,7 +125,7 @@ React Dashboard
 * Create Analyze Repository button
 * Improve layout and styling
 
-**Status:** ✅ Basic structure completed
+**Status:** ✅ Completed
 
 ---
 
@@ -144,9 +144,9 @@ React Dashboard
 * Prepare API request
 * Display backend results
 
-**Status:** 🟡 Started
+**Status:** ✅ Implemented
 
-Repository URL state and input handling have been implemented. React-to-FastAPI integration is the next major frontend step.
+Repository URL state, input handling, loading state, error handling, and the analysis request flow have been implemented.
 
 ---
 
@@ -168,18 +168,20 @@ Repository URL state and input handling have been implemented. React-to-FastAPI 
 
 **Status:** ✅ Mostly Completed
 
-The FastAPI server is running successfully and the following endpoints are available:
+The FastAPI server is running successfully.
 
-```text
+Available endpoints:
+
+
 GET /
 POST /analyze
-```
 
-Swagger documentation is available through:
 
-```text
+Swagger documentation:
+
+
 http://127.0.0.1:8000/docs
-```
+
 
 ---
 
@@ -198,10 +200,9 @@ http://127.0.0.1:8000/docs
 * HTTP status handling
 * Invalid JSON response handling
 * Repository information retrieval
+* Repository file retrieval
 
-**Status:** 🟡 In Progress
-
-The backend can reach the GitHub API and repository analysis is being tested and improved.
+**Status:** ✅ Implemented and being tested
 
 ---
 
@@ -219,11 +220,9 @@ The backend can reach the GitHub API and repository analysis is being tested and
 * Security
 * Maintainability
 
-The analyzer now processes repository file information returned by GitHub.
+The analyzer processes repository information and file data returned by GitHub.
 
 **Status:** 🟡 In Progress
-
-The first detailed repository analysis modules have been implemented and are being tested incrementally.
 
 ---
 
@@ -248,7 +247,7 @@ The analyzer generates a documentation score and supporting details.
 
 **Goal:** Detect testing-related files and evaluate repository testing support.
 
-### Planned Checks
+### Current Checks
 
 * Test directories
 * Test files
@@ -256,9 +255,9 @@ The analyzer generates a documentation score and supporting details.
 * Testing configuration
 * Testing framework indicators
 
-**Status:** 🟡 Implemented / Being Improved
+The testing score and details are now part of the analysis structure.
 
-The testing score and details are now part of the analysis structure, with additional checks planned.
+**Status:** 🟡 Implemented / Being Improved
 
 ---
 
@@ -268,7 +267,7 @@ The testing score and details are now part of the analysis structure, with addit
 
 ### Current Checks
 
-The analyzer now checks:
+The analyzer checks:
 
 * Common project folders
 * Source file count
@@ -306,22 +305,22 @@ build.gradle
 vite.config.js
 vite.config.ts
 tsconfig.json
-```
+
 
 ### Analysis Details
 
 The analyzer returns descriptive messages such as:
 
-```text
+
 Organized project folders detected.
 10 source files detected.
 Project configuration files detected.
 Repository contains organized subdirectories.
-```
 
-The API now returns Code Structure in the following format:
 
-```json
+Example response:
+
+
 {
   "code_structure": {
     "score": 15,
@@ -339,7 +338,95 @@ The API now returns Code Structure in the following format:
 }
 ```
 
-**Status:** ✅ Implemented and being tested
+**Status:** ✅ Implemented and tested
+
+---
+
+## Phase 9.1 — Score Dashboard
+
+**Goal:** Display repository health scores through a clear dashboard.
+
+### Implemented
+
+* Overall Repository Health card
+* Overall health score
+* `/100` score display
+* Overall progress bar
+* Documentation score
+* Testing score
+* Code Structure score
+* Security score
+* Maintainability score
+* Category progress bars
+* Responsive score layout
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 9.2 — Dashboard CSS Styling
+
+**Goal:** Improve the visual appearance of the score dashboard.
+
+### Implemented
+
+* Dashboard cards
+* Rounded cards
+* Shadows
+* Progress bars
+* Category score cards
+* Responsive layout
+* Mobile-friendly category layout
+* Improved spacing and typography
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 9.3 — Repository Information Section
+
+**Goal:** Improve the repository information section of the dashboard.
+
+### Implemented
+
+The frontend now displays repository information using a structured card layout.
+
+### Repository Information
+
+* Repository name
+* Programming language
+* Stars
+* Forks
+* Open issues
+* Default branch
+* Repository description
+* View Repository on GitHub link
+
+### UI Structure
+
+```text
+Repository Information
+        |
+        +---- Repository
+        |
+        +---- Language
+        |
+        +---- Stars
+        |
+        +---- Forks
+        |
+        +---- Open Issues
+        |
+        +---- Default Branch
+        |
+        +---- Description
+        |
+        +---- GitHub Repository Link
+```
+
+The section is also responsive for smaller screens.
+
+**Status:** 🔄 In Progress / Testing
 
 ---
 
@@ -384,7 +471,7 @@ Future versions may integrate tools such as Radon for Python complexity analysis
 
 **Goal:** Combine individual analysis categories into an overall health score.
 
-### Planned Structure
+### Current Structure
 
 ```text
 Documentation
@@ -401,7 +488,7 @@ Maintainability
 Overall Health Score / 100
 ```
 
-The scoring engine currently contains individual category calculations.
+The scoring engine contains individual category calculations.
 
 **Status:** 🟡 In Progress
 
@@ -428,7 +515,7 @@ The scoring engine currently contains individual category calculations.
 
 ## Phase 14 — React + FastAPI Integration
 
-**Goal:** Connect the completed backend analysis system with the React frontend.
+**Goal:** Connect the backend analysis system with the React frontend.
 
 ### Tasks
 
@@ -442,15 +529,17 @@ The scoring engine currently contains individual category calculations.
 * Display category scores
 * Display analysis details
 
-**Status:** ⏳ Next Major Step
+**Status:** 🔄 In Progress
+
+The React application already contains the repository analysis request flow. The next work is to fully connect and refine the frontend display of all backend analysis results.
 
 ---
 
 ## Phase 15 — Dashboard and Visualization
 
-**Goal:** Present the repository analysis clearly through a dashboard.
+**Goal:** Present the repository analysis clearly through a complete dashboard.
 
-### Planned Dashboard
+### Implemented / Planned Dashboard
 
 * Overall health score
 * Documentation score
@@ -458,13 +547,16 @@ The scoring engine currently contains individual category calculations.
 * Code Structure score
 * Security score
 * Maintainability score
-* Analysis details
 * Repository statistics
+* Analysis details
+* Progress bars
 * Charts
 * Detected issues
 * Recommendations
 
-**Status:** ⏳ Pending
+**Status:** 🟡 In Progress
+
+The score dashboard and repository information section have already been implemented. Further visualization and analysis-detail improvements are planned.
 
 ---
 
@@ -507,8 +599,6 @@ Possible future features:
 
 ## Current Project Structure
 
-The project currently follows this structure:
-
 ```text
 github-health-analyzer/
 │
@@ -538,9 +628,9 @@ github-health-analyzer/
 
 ---
 
-## Frontend Progress
+# Frontend Progress
 
-The React/Vite project has been created successfully.
+The React/Vite frontend has been successfully created and is being developed incrementally.
 
 ### Implemented
 
@@ -552,6 +642,17 @@ The React/Vite project has been created successfully.
 * Repository URL input
 * React state using `useState`
 * Analyze Repository button
+* Loading state
+* Error handling
+* Repository analysis request
+* Overall health score dashboard
+* Category score cards
+* Category progress bars
+* Responsive dashboard styling
+* Repository information section
+* Repository statistics
+* Repository description
+* GitHub repository link
 
 ### Current Frontend Flow
 
@@ -568,10 +669,22 @@ Analyze Repository button
 FastAPI API request
         |
         v
-Display analysis results
+Backend analyzes repository
+        |
+        v
+JSON analysis response
+        |
+        v
+React Dashboard
+        |
+        +---- Overall Health Score
+        |
+        +---- Category Scores
+        |
+        +---- Repository Information
+        |
+        +---- Analysis Details
 ```
-
-The frontend is now ready for the next stage of backend API integration and result visualization.
 
 ---
 
@@ -596,6 +709,7 @@ The FastAPI backend has been created successfully.
 * GitHub username/repository extraction
 * GitHub API request structure
 * Repository information retrieval
+* Repository file retrieval
 * Documentation scoring
 * Testing scoring
 * Code Structure scoring
@@ -605,7 +719,7 @@ The FastAPI backend has been created successfully.
 
 ---
 
-## Current Backend Flow
+# Current Backend Flow
 
 ```text
 POST /analyze
@@ -650,9 +764,7 @@ Return JSON response
 
 ---
 
-## Current Code Structure Analysis Flow
-
-The Code Structure analyzer now performs several checks:
+# Current Code Structure Analysis Flow
 
 ```text
 Repository Files
@@ -671,11 +783,11 @@ Code Structure Score
 Analysis Details
 ```
 
-This allows the backend to return both a numerical score and human-readable explanations.
+The Code Structure analyzer returns both a numerical score and human-readable analysis messages.
 
 ---
 
-## API Response Structure
+# API Response Structure
 
 The `/analyze` endpoint is being developed toward a response similar to:
 
@@ -702,7 +814,10 @@ The `/analyze` endpoint is being developed toward a response similar to:
       "score": 10,
       "details": []
     },
-    "maintainability": 15
+    "maintainability": {
+      "score": 15,
+      "details": []
+    }
   }
 }
 ```
@@ -713,46 +828,72 @@ The exact scores depend on the repository being analyzed.
 
 # Current Development Status
 
-### Completed
+## Completed
 
 * ✅ React/Vite project setup
 * ✅ Basic frontend UI
 * ✅ Repository URL input
+* ✅ React state management
 * ✅ FastAPI backend
 * ✅ GitHub URL validation
 * ✅ GitHub API integration structure
 * ✅ Repository information retrieval
+* ✅ Repository file retrieval
 * ✅ Documentation analysis
 * ✅ Testing analysis foundation
 * ✅ Code Structure scoring
 * ✅ Code Structure detail analysis
 * ✅ Basic security analysis
 * ✅ Maintainability scoring
+* ✅ Overall health score dashboard
+* ✅ Category score cards
+* ✅ Progress bars
+* ✅ Dashboard CSS styling
+* ✅ Responsive dashboard layout
+* ✅ Repository information card section
 
-### Currently Working On
+## Currently Working On
 
-* 🔄 Testing and improving repository analysis
-* 🔄 Connecting React frontend with FastAPI
-* 🔄 Displaying analysis results in the frontend
+* 🔄 Testing repository analysis with different GitHub repositories
+* 🔄 Improving React + FastAPI integration
+* 🔄 Displaying all backend analysis results in the frontend
 * 🔄 Improving scoring accuracy
+* 🔄 Improving detailed analysis cards
+* 🔄 Improving repository statistics presentation
 
-### Next Immediate Step
+## Next Immediate Step
 
-The next step is to update **`Home.jsx`** so the React dashboard can display:
+The next development step is:
+
+### **Phase 9.4 — Detailed Analysis Cards**
+
+The frontend will be improved to display detailed analysis messages for each category.
+
+The planned structure is:
 
 ```text
-Code Structure Score
-        |
-        +---- Score
-        |
-        +---- Analysis Details
-        |
-        +---- Success Messages
-        |
-        +---- Warning Messages
+Analysis Details
+       |
+       +---- Documentation
+       |       +---- Success
+       |       +---- Warning
+       |
+       +---- Testing
+       |       +---- Success
+       |       +---- Warning
+       |
+       +---- Code Structure
+       |       +---- Success
+       |       +---- Warning
+       |
+       +---- Security
+       |       +---- Success
+       |       +---- Warning
+       |
+       +---- Maintainability
+               +---- Success
+               +---- Warning
 ```
-
-After that, the remaining analysis categories can be connected to the frontend in the same way.
 
 ---
 
@@ -800,6 +941,8 @@ GitHub Repository URL
 
 ## Current Milestone
 
-**Backend repository analysis is now being built category-by-category.**
+**The repository analysis backend and initial React dashboard are now functional and are being developed category-by-category.**
 
-The latest completed development step is the **Code Structure Analysis Details** module. The next development step is to connect these backend results to the React `Home.jsx` interface.
+The latest frontend development includes the **Score Dashboard, Dashboard CSS Styling, and Repository Information Section**.
+
+The **next development step is Phase 9.4 — Detailed Analysis Cards**, followed by further React dashboard improvements and complete backend/frontend integration.
