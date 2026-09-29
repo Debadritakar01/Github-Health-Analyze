@@ -85,3 +85,42 @@ async def get_repository_contents(username: str, repository: str):
 
     return data.get("tree", [])
 
+async def get_file_content(username: str, repository: str, file_path: str):
+
+    url = (
+        f"https://api.github.com/repos/"
+        f"{username}/{repository}/contents/{file_path}"
+    )
+
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "GitHub-Health-Analyzer"
+    }
+
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        response = await client.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return None
+
+    data = response.json()
+
+    if data.get("type") != "file":
+        return None
+
+    import base64
+
+    encoded_content = data.get("content")
+
+    if not encoded_content:
+        return None
+
+    try:
+        decoded_content = base64.b64decode(
+            encoded_content
+        ).decode("utf-8")
+
+        return decoded_content
+
+    except (ValueError, UnicodeDecodeError):
+        return None

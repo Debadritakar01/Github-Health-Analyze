@@ -1,3 +1,5 @@
+import json
+
 
 # ============================================================
 # DOCUMENTATION ANALYSIS
@@ -224,11 +226,100 @@ def get_documentation_details(repository_info, readme_content):
 
 
 # ============================================================
+# PACKAGE.JSON TESTING DETECTION
+# ============================================================
+
+def detect_testing_framework_from_package(package_content):
+
+    if not package_content:
+        return []
+
+    try:
+        package_data = json.loads(package_content)
+
+    except json.JSONDecodeError:
+        return []
+
+    dependencies = package_data.get("dependencies", {})
+    dev_dependencies = package_data.get("devDependencies", {})
+
+    all_dependencies = {
+        **dependencies,
+        **dev_dependencies
+    }
+
+    testing_frameworks = [
+        "jest",
+        "vitest",
+        "mocha",
+        "cypress",
+        "playwright"
+    ]
+
+    detected_frameworks = []
+
+    for framework in testing_frameworks:
+
+        if framework in all_dependencies:
+            detected_frameworks.append(framework)
+
+    return detected_frameworks
+
+
+def detect_test_script_from_package(package_content):
+
+    if not package_content:
+        return False
+
+    try:
+        package_data = json.loads(package_content)
+
+    except json.JSONDecodeError:
+        return False
+
+    scripts = package_data.get("scripts", {})
+
+    test_script = scripts.get("test")
+
+    if not test_script:
+        return False
+
+    return True
+def detect_python_testing_framework(repository_files):
+
+    if not repository_files:
+        return []
+
+    file_paths = [
+        item.get("path", "").lower().strip("/")
+        for item in repository_files
+        if isinstance(item, dict)
+    ]
+
+    detected_frameworks = []
+
+    # pytest configuration
+    if any(
+        path.split("/")[-1] in ["pytest.ini", "tox.ini"]
+        for path in file_paths
+    ):
+        detected_frameworks.append("pytest")
+
+    # pytest configuration through conftest.py
+    if any(
+        path.split("/")[-1] == "conftest.py"
+        for path in file_paths
+    ):
+        if "pytest" not in detected_frameworks:
+            detected_frameworks.append("pytest")
+
+    return detected_frameworks
+
+# ============================================================
 # TESTING ANALYSIS
 # ============================================================
 
-
-def calculate_testing_score(repository_files):
+def calculate_testing_score(repository_files, package_content=None):
 
     score = 0
 
@@ -252,19 +343,28 @@ def calculate_testing_score(repository_files):
     # --------------------------------
 
     test_indicators = [
-        "test/",
-        "tests/",
-        "__tests__/",
-        "spec/",
-        "specs/"
+        "test",
+        "tests",
+        "__tests__",
+        "spec",
+        "specs"
     ]
 
-    test_files = [
-        path
-        for path in file_paths
-        if (
-            any(path.startswith(folder) for folder in test_indicators)
-            or path.endswith(".test.js")
+    test_files = []
+
+    for path in file_paths:
+
+        path_parts = path.split("/")
+
+        # Check for test directories anywhere
+        has_test_directory = any(
+            folder in path_parts
+            for folder in test_indicators
+        )
+
+        # Check common test file naming conventions
+        has_test_extension = (
+            path.endswith(".test.js")
             or path.endswith(".test.jsx")
             or path.endswith(".test.ts")
             or path.endswith(".test.tsx")
@@ -273,12 +373,15 @@ def calculate_testing_score(repository_files):
             or path.endswith(".spec.ts")
             or path.endswith(".spec.tsx")
             or path.endswith("_test.py")
-            or path.startswith("test_")
+            or path.split("/")[-1].startswith("test_")
         )
-    ]
 
-    if test_files:
-        score += 5
+        if has_test_directory or has_test_extension:
+            test_files.append(path)
+
+    # Multiple test files
+    if len(test_files) >= 3:
+        score += 4
 
     # --------------------------------
     # 2. Testing frameworks/config
@@ -291,93 +394,74 @@ def calculate_testing_score(repository_files):
         "vitest.config.js",
         "vitest.config.ts",
         "pytest.ini",
-        "pyproject.toml",
         "tox.ini",
         ".mocharc.json",
         ".mocharc.js",
         "karma.conf.js"
     ]
 
-    if any(
-        path in framework_files
-        for path in file_paths
-    ):
-        score += 5
-
-    # --------------------------------
-    # 3. Multiple test files
-    # --------------------------------
-
-    if len(test_files) >= 3:
-        score += 4
-
-    # --------------------------------
-    # 4. Testing dependencies
-    # --------------------------------
-
-    dependency_files = [
-        "package.json",
-        "requirements.txt",
-        "pyproject.toml",
-        "pipfile"
-    ]
-
-    dependency_file_exists = any(
-        path in dependency_files
+    framework_config_detected = any(
+        path.split("/")[-1] in framework_files
         for path in file_paths
     )
 
-    testing_dependency_names = [
-        "jest",
-        "vitest",
-        "mocha",
-        "chai",
-        "pytest",
-        "unittest",
-        "selenium",
-        "cypress",
-        "playwright"
-    ]
+    detected_frameworks = detect_testing_framework_from_package(
+        package_content
+    )
+    python_frameworks = detect_python_testing_framework(
+    repository_files
+   )
 
-    testing_dependency_files = [
-        path
-        for path in file_paths
-        if any(
-            dependency in path
-            for dependency in testing_dependency_names
+    detected_frameworks = list(
+        dict.fromkeys(
+            detected_frameworks + python_frameworks
         )
+    )
+    framework_detected = (
+        framework_config_detected
+        or bool(detected_frameworks)
+    )
+
+    if framework_detected:
+        score += 4
+
+    # --------------------------------
+    # 3. Test script
+    # --------------------------------
+
+    test_script_detected = detect_test_script_from_package(
+        package_content
+    )
+
+    if test_script_detected:
+        score += 2
+
+    # --------------------------------
+    # 4. Python testing configuration
+    # --------------------------------
+
+    python_testing_files = [
+        "pytest.ini",
+        "tox.ini",
+        "conftest.py"
     ]
 
-    if dependency_file_exists and testing_dependency_files:
+    python_testing_detected = any(
+        path.split("/")[-1] in python_testing_files
+        for path in file_paths
+    )
+
+    if python_testing_detected and not framework_detected:
         score += 3
 
     # --------------------------------
-    # 5. Test scripts/configuration
+    # Maximum testing score
     # --------------------------------
-
-    script_indicators = [
-        "test script",
-        "test",
-        "testing",
-        "npm test"
-    ]
-
-    script_files = [
-        path
-        for path in file_paths
-        if any(
-            indicator in path
-            for indicator in script_indicators
-        )
-    ]
-
-    if script_files:
-        score += 3
 
     return min(score, 20)
 
 
-def get_testing_details(repository_files):
+def get_testing_details(repository_files, package_content=None):
 
     details = []
 
@@ -406,16 +490,27 @@ def get_testing_details(repository_files):
     # 1. Test files
     # --------------------------------
 
-    test_files = [
-        path
-        for path in file_paths
-        if (
-            path.startswith("test/")
-            or path.startswith("tests/")
-            or path.startswith("__tests__/")
-            or path.startswith("spec/")
-            or path.startswith("specs/")
-            or path.endswith(".test.js")
+    test_indicators = [
+        "test",
+        "tests",
+        "__tests__",
+        "spec",
+        "specs"
+    ]
+
+    test_files = []
+
+    for path in file_paths:
+
+        path_parts = path.split("/")
+
+        has_test_directory = any(
+            folder in path_parts
+            for folder in test_indicators
+        )
+
+        has_test_extension = (
+            path.endswith(".test.js")
             or path.endswith(".test.jsx")
             or path.endswith(".test.ts")
             or path.endswith(".test.tsx")
@@ -424,9 +519,11 @@ def get_testing_details(repository_files):
             or path.endswith(".spec.ts")
             or path.endswith(".spec.tsx")
             or path.endswith("_test.py")
-            or path.startswith("test_")
+            or path.split("/")[-1].startswith("test_")
         )
-    ]
+
+        if has_test_directory or has_test_extension:
+            test_files.append(path)
 
     if test_files:
 
@@ -459,20 +556,37 @@ def get_testing_details(repository_files):
         "karma.conf.js"
     ]
 
-    detected_frameworks = [
-        path
+    package_frameworks = detect_testing_framework_from_package(
+        package_content
+    )
+
+    config_frameworks = [
+        path.split("/")[-1]
         for path in file_paths
-        if path in framework_files
+        if path.split("/")[-1] in framework_files
     ]
 
-    if detected_frameworks:
+    if package_frameworks:
 
         details.append({
             "type": "success",
-            "message": "Testing framework configuration detected."
+            "message": (
+                "Testing framework detected from package.json: "
+                + ", ".join(package_frameworks)
+            )
         })
 
-    else:
+    if config_frameworks:
+
+        details.append({
+            "type": "success",
+            "message": (
+                "Testing framework configuration detected: "
+                + ", ".join(config_frameworks)
+            )
+        })
+
+    if not package_frameworks and not config_frameworks:
 
         details.append({
             "type": "warning",
@@ -508,36 +622,29 @@ def get_testing_details(repository_files):
         "pipfile"
     ]
 
-    testing_dependency_names = [
-        "jest",
-        "vitest",
-        "mocha",
-        "chai",
-        "pytest",
-        "unittest",
-        "selenium",
-        "cypress",
-        "playwright"
-    ]
-
     dependency_exists = any(
         path in dependency_files
         for path in file_paths
     )
 
-    testing_dependency_detected = any(
-        any(
-            dependency in path
-            for dependency in testing_dependency_names
-        )
-        for path in file_paths
-    )
-
-    if dependency_exists and testing_dependency_detected:
+    if package_frameworks:
 
         details.append({
             "type": "success",
-            "message": "Testing dependency indicators detected."
+            "message": (
+                "Testing dependencies detected in package.json: "
+                + ", ".join(package_frameworks)
+            )
+        })
+
+    elif dependency_exists:
+
+        details.append({
+            "type": "warning",
+            "message": (
+                "Dependency file found, but no recognized "
+                "testing framework detected."
+            )
         })
 
     else:
@@ -548,30 +655,25 @@ def get_testing_details(repository_files):
         })
 
     # --------------------------------
-    # 5. Test scripts/configuration
+    # 5. Test script
     # --------------------------------
 
-    test_script_files = [
-        path
-        for path in file_paths
-        if (
-            "test" in path
-            or "testing" in path
-        )
-    ]
+    test_script_detected = detect_test_script_from_package(
+        package_content
+    )
 
-    if test_script_files:
+    if test_script_detected:
 
         details.append({
             "type": "success",
-            "message": "Test-related configuration or scripts detected."
+            "message": "Test script detected in package.json."
         })
 
     else:
 
         details.append({
             "type": "warning",
-            "message": "No test-related scripts or configuration detected."
+            "message": "No test script detected in package.json."
         })
 
     return details
@@ -900,16 +1002,16 @@ def calculate_security_score(repository_files):
         if path
     ]
 
-    # --------------------------------------------------
+    # --------------------------------
     # 1. Check .gitignore
-    # --------------------------------------------------
+    # --------------------------------
 
     if ".gitignore" in file_paths:
         score += 4
 
-    # --------------------------------------------------
+    # --------------------------------
     # 2. Check environment template
-    # --------------------------------------------------
+    # --------------------------------
 
     environment_files = [
         ".env.example",
@@ -923,9 +1025,9 @@ def calculate_security_score(repository_files):
     ):
         score += 3
 
-    # --------------------------------------------------
+    # --------------------------------
     # 3. Check security documentation
-    # --------------------------------------------------
+    # --------------------------------
 
     security_files = [
         "security.md",
@@ -940,9 +1042,9 @@ def calculate_security_score(repository_files):
     ):
         score += 3
 
-    # --------------------------------------------------
+    # --------------------------------
     # 4. Check dependency/configuration files
-    # --------------------------------------------------
+    # --------------------------------
 
     dependency_files = [
         "package.json",
@@ -966,9 +1068,9 @@ def calculate_security_score(repository_files):
     if detected_dependencies:
         score += 3
 
-    # --------------------------------------------------
-    # 5. Check for suspicious sensitive files
-    # --------------------------------------------------
+    # --------------------------------
+    # 5. Check suspicious sensitive files
+    # --------------------------------
 
     sensitive_file_names = [
         ".env",
@@ -994,8 +1096,6 @@ def calculate_security_score(repository_files):
         )
     ]
 
-    # Give security points when no obvious sensitive files
-    # are detected.
     if not sensitive_files:
         score += 7
 
@@ -1007,6 +1107,7 @@ def get_security_details(repository_files):
     details = []
 
     if not repository_files:
+
         details.append({
             "type": "warning",
             "message": "Repository files could not be analyzed for security."
@@ -1026,9 +1127,9 @@ def get_security_details(repository_files):
         if path
     ]
 
-    # --------------------------------------------------
+    # --------------------------------
     # 1. .gitignore
-    # --------------------------------------------------
+    # --------------------------------
 
     if ".gitignore" in file_paths:
 
@@ -1044,9 +1145,9 @@ def get_security_details(repository_files):
             "message": ".gitignore file is missing."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 2. Environment template
-    # --------------------------------------------------
+    # --------------------------------
 
     environment_files = [
         ".env.example",
@@ -1074,9 +1175,9 @@ def get_security_details(repository_files):
             "message": "No environment template file detected."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 3. Security documentation
-    # --------------------------------------------------
+    # --------------------------------
 
     security_files = [
         "security.md",
@@ -1105,9 +1206,9 @@ def get_security_details(repository_files):
             "message": "Security documentation not found."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 4. Dependency files
-    # --------------------------------------------------
+    # --------------------------------
 
     dependency_files = [
         "package.json",
@@ -1145,9 +1246,9 @@ def get_security_details(repository_files):
             "message": "No common dependency files detected."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 5. Sensitive files
-    # --------------------------------------------------
+    # --------------------------------
 
     sensitive_file_names = [
         ".env",
@@ -1197,7 +1298,6 @@ def get_security_details(repository_files):
 # MAINTAINABILITY ANALYSIS
 # ============================================================
 
-
 def calculate_maintainability_score(repository_files):
 
     score = 0
@@ -1217,9 +1317,9 @@ def calculate_maintainability_score(repository_files):
         if path
     ]
 
-    # --------------------------------------------------
+    # --------------------------------
     # 1. README / Documentation
-    # --------------------------------------------------
+    # --------------------------------
 
     documentation_files = [
         "readme.md",
@@ -1233,9 +1333,9 @@ def calculate_maintainability_score(repository_files):
     ):
         score += 4
 
-    # --------------------------------------------------
+    # --------------------------------
     # 2. Organized source structure
-    # --------------------------------------------------
+    # --------------------------------
 
     important_folders = [
         "src/",
@@ -1261,12 +1361,13 @@ def calculate_maintainability_score(repository_files):
 
     if len(organized_folders) >= 3:
         score += 4
+
     elif len(organized_folders) >= 1:
         score += 2
 
-    # --------------------------------------------------
+    # --------------------------------
     # 3. Source-file organization
-    # --------------------------------------------------
+    # --------------------------------
 
     source_extensions = (
         ".py",
@@ -1292,12 +1393,13 @@ def calculate_maintainability_score(repository_files):
 
     if 3 <= source_count <= 100:
         score += 4
+
     elif source_count > 0:
         score += 2
 
-    # --------------------------------------------------
+    # --------------------------------
     # 4. Dependency / configuration management
-    # --------------------------------------------------
+    # --------------------------------
 
     configuration_files = [
         "package.json",
@@ -1322,9 +1424,9 @@ def calculate_maintainability_score(repository_files):
     if detected_configs:
         score += 4
 
-    # --------------------------------------------------
+    # --------------------------------
     # 5. Temporary / duplicate-looking files
-    # --------------------------------------------------
+    # --------------------------------
 
     temporary_indicators = [
         ".tmp",
@@ -1374,9 +1476,9 @@ def get_maintainability_details(repository_files):
         if path
     ]
 
-    # --------------------------------------------------
+    # --------------------------------
     # 1. README / Documentation
-    # --------------------------------------------------
+    # --------------------------------
 
     documentation_files = [
         "readme.md",
@@ -1401,9 +1503,9 @@ def get_maintainability_details(repository_files):
             "message": "README/documentation file not detected."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 2. Organized source structure
-    # --------------------------------------------------
+    # --------------------------------
 
     important_folders = [
         "src/",
@@ -1454,9 +1556,9 @@ def get_maintainability_details(repository_files):
             "message": "No common organized project folders detected."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 3. Source-file organization
-    # --------------------------------------------------
+    # --------------------------------
 
     source_extensions = (
         ".py",
@@ -1506,17 +1608,17 @@ def get_maintainability_details(repository_files):
             "message": "No source code files detected."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 4. Configuration / dependency management
-    # --------------------------------------------------
+    # --------------------------------
 
     configuration_files = [
         "package.json",
         "package-lock.json",
         "yarn.lock",
         "pnpm-lock.yaml",
-        "requirements.txt",
         "pipfile",
+        "requirements.txt",
         "pyproject.toml",
         "poetry.lock",
         "pom.xml",
@@ -1547,9 +1649,9 @@ def get_maintainability_details(repository_files):
             "message": "No common dependency/configuration files detected."
         })
 
-    # --------------------------------------------------
+    # --------------------------------
     # 5. Temporary / duplicate-looking files
-    # --------------------------------------------------
+    # --------------------------------
 
     temporary_indicators = [
         ".tmp",
@@ -1586,6 +1688,3 @@ def get_maintainability_details(repository_files):
         })
 
     return details
-
-
-

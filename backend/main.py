@@ -6,7 +6,8 @@ from urllib.parse import urlparse
 from github_api import (
     get_repository_info,
     get_readme,
-    get_repository_contents
+    get_repository_contents,
+    get_file_content
 )
 
 from health_analyzer import (
@@ -138,6 +139,11 @@ async def analyze_repository(request: RepositoryRequest):
         username,
         repository_name
     )
+    package_content = await get_file_content(
+        username,
+        repository,
+        "package.json"
+    )
 
 
     # -----------------------------
@@ -145,11 +151,13 @@ async def analyze_repository(request: RepositoryRequest):
     # -----------------------------
 
     testing_score = calculate_testing_score(
-        repository_files
-    )
+    repository_files,
+    package_content
+   )
 
     testing_details = get_testing_details(
-        repository_files
+        repository_files,
+        package_content
     )
 
 
