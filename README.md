@@ -245,8 +245,14 @@ The analyzer generates a documentation score and supporting details.
 
 * Test directories
 * Test files
-* `.test.js`, `.test.jsx`, `.test.ts`, `.test.tsx`
-* `.spec.js`, `.spec.jsx`, `.spec.ts`, `.spec.tsx`
+* `.test.js`
+* `.test.jsx`
+* `.test.ts`
+* `.test.tsx`
+* `.spec.js`
+* `.spec.jsx`
+* `.spec.ts`
+* `.spec.tsx`
 * Python test files
 * Testing framework configuration
 * Testing dependency indicators
@@ -697,7 +703,245 @@ The actual scores depend on the repository being analyzed.
 * Test against multiple repository types
 * Compare analysis results across different GitHub repositories
 
-**Status:** 🚀 Next Phase
+---
+
+## Phase 17.1 — Detection Rule Improvements
+
+The analyzer detection rules were reviewed and improved to better identify repository structure, testing support, configuration files, security indicators, and maintainability indicators.
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 17.2 — Testing Detection Improvements
+
+Testing detection was improved to recognize multiple testing conventions.
+
+### Supported Indicators
+
+* Test directories
+* Test files
+* `.test.js`
+* `.test.jsx`
+* `.test.ts`
+* `.test.tsx`
+* `.spec.js`
+* `.spec.jsx`
+* `.spec.ts`
+* `.spec.tsx`
+* Python test files
+* Testing framework indicators
+* Testing dependencies
+* Test-related configuration
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 17.3 — Code Structure Detection Improvements
+
+Code structure detection was refined to identify common project organization patterns.
+
+### Detected Project Folders
+
+```text
+src/
+app/
+components/
+backend/
+frontend/
+api/
+utils/
+services/
+models/
+controllers/
+```
+
+### Detected Configuration Files
+
+```text
+package.json
+requirements.txt
+pyproject.toml
+pom.xml
+build.gradle
+vite.config.js
+vite.config.ts
+tsconfig.json
+```
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 17.4 — Security Detection Improvements
+
+Security analysis was reviewed to identify potentially sensitive repository files and security-related configuration.
+
+### Current Checks
+
+* `.gitignore`
+* Environment template files
+* Security documentation
+* Dependency/configuration files
+* `.env` files
+* Credential files
+* Secret files
+* `.pem` files
+* `.key` files
+* SSH private key indicators
+
+The analyzer currently focuses primarily on repository file paths.
+
+It does not yet claim to detect actual secrets inside source-file contents.
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 17.5 — Maintainability Detection Improvements
+
+Maintainability analysis was refined to evaluate repository organization and maintainability indicators.
+
+### Current Checks
+
+* README/documentation
+* Organized project folders
+* Source-file count
+* Configuration/dependency files
+* Temporary or backup-looking files
+
+Advanced code-complexity and duplicate-code analysis are planned for a future phase.
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 17.6 — False Positive Review
+
+The scoring and detection rules were reviewed to reduce unnecessary or incorrect detections.
+
+The analyzer focuses on identifiable repository indicators rather than assuming that the presence or absence of a single file represents the complete quality of a project.
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 17.7 — Scoring Weights
+
+The five health categories use equal weighting.
+
+### Category Weights
+
+| Category        | Maximum Score |   Weight |
+| --------------- | ------------: | -------: |
+| Documentation   |            20 |      1.0 |
+| Testing         |            20 |      1.0 |
+| Code Structure  |            20 |      1.0 |
+| Security        |            20 |      1.0 |
+| Maintainability |            20 |      1.0 |
+| **Total**       |       **100** | **100%** |
+
+The scoring system uses an explicit `category_weights` structure so the weighting can be modified centrally in the future without changing the overall scoring architecture.
+
+The current implementation keeps all categories at `1.0`, preserving the existing `/100` scoring system.
+
+### Overall Score
+
+```text
+Overall Score =
+Documentation
++ Testing
++ Code Structure
++ Security
++ Maintainability
+```
+
+Maximum possible score:
+
+```text
+20 + 20 + 20 + 20 + 20 = 100
+```
+
+**Status:** ✅ Completed
+
+---
+
+## Phase 17.8 — Multiple Repository Testing
+
+**Goal:** Verify that the analyzer works correctly across different types of GitHub repositories.
+
+The analyzer is being tested against repositories with different programming languages, project structures, testing conventions, and configuration files.
+
+### Repository Test 1 — Own Project
+
+Repository:
+
+```text
+https://github.com/Debadritakar01/Github-Health-Analyze
+```
+
+The project was tested through the `/analyze` endpoint.
+
+### Verified
+
+* Repository URL processing
+* GitHub API communication
+* Repository information retrieval
+* Repository file retrieval
+* Documentation scoring
+* Testing scoring
+* Code Structure scoring
+* Security scoring
+* Maintainability scoring
+* Overall health score
+* JSON response generation
+
+**Status:** ✅ Completed
+
+---
+
+### Repository Test 2 — Python Project
+
+Repository:
+
+```text
+https://github.com/pallets/flask
+```
+
+This test is being used to verify the analyzer against a large Python-based project.
+
+### Verification Areas
+
+* Repository information
+* Python project detection
+* Testing detection
+* Testing framework indicators
+* Code structure detection
+* Security indicators
+* Maintainability indicators
+* Overall health score
+* `/analyze` response reliability
+
+**Status:** 🔄 In Progress
+
+---
+
+### Repository Test 3 — Repository with Tests and Configuration
+
+A third repository will be tested after the Python repository test.
+
+The purpose is to verify detection of:
+
+* Multiple test files
+* Test directories
+* Testing configuration
+* Dependency/configuration files
+* Organized source structure
+* Security-related files
+* Maintainability indicators
+
+**Status:** ⏳ Pending
 
 ---
 
@@ -897,6 +1141,7 @@ The FastAPI backend has been successfully created and the main analysis pipeline
 * Security analysis details
 * Maintainability scoring
 * Maintainability analysis details
+* Equal category weighting
 * Overall health score calculation
 
 ---
@@ -938,7 +1183,10 @@ Run analysis modules
       +----> Maintainability
       |
       v
-Calculate scores
+Apply category weights
+      |
+      v
+Calculate overall score
       |
       v
 Return JSON response
@@ -1083,48 +1331,74 @@ The exact scores depend on the repository being analyzed.
 * ✅ Security analysis
 * ✅ Maintainability analysis
 * ✅ Overall health score
+* ✅ Equal category weighting
+* ✅ Scoring weight configuration
 * ✅ Category score cards
 * ✅ Progress bars
 * ✅ Dashboard CSS styling
 * ✅ Responsive dashboard layout
 * ✅ Repository information section
+* ✅ Repository statistics
 * ✅ Final backend analysis flow testing
+* ✅ Testing against own GitHub repository
+
+---
 
 ## Currently Working On
 
+* 🔄 Testing the analyzer against a Python repository
+* 🔄 Testing multiple repository types
 * 🔄 Improving scoring accuracy
-* 🔄 Testing the analyzer with different GitHub repositories
+* 🔄 Identifying false positives
+* 🔄 Improving detection rules
+* 🔄 Validating the five-category scoring system
 * 🔄 Improving React + FastAPI integration
 * 🔄 Displaying all backend analysis details in the frontend
 * 🔄 Improving detailed analysis cards
 * 🔄 Improving repository statistics presentation
 
-## Next Development Step
+---
 
-### Phase 17 — Improving Scoring Accuracy
+# Next Development Step
 
-The next development phase will focus on making the analyzer more reliable across different types of GitHub repositories.
+## Phase 17.8 — Complete Multiple Repository Testing
 
-The planned work includes:
+The current development step is to complete testing against multiple repository types.
+
+### Testing Sequence
 
 ```text
-Repository Testing
-       |
-       v
+Own React/JavaScript Repository
+             |
+             v
+        Test Passed
+             |
+             v
+Python Repository
+             |
+             v
+     Verify Python Detection
+             |
+             v
+Third Repository
+             |
+             v
+Verify Testing + Configuration
+             |
+             v
+Compare Results
+             |
+             v
 Identify False Positives
-       |
-       v
-Improve Detection Rules
-       |
-       v
-Refine Scoring Weights
-       |
-       v
-Test Multiple Repositories
-       |
-       v
-Improve Health Score Accuracy
+             |
+             v
+Refine Detection Rules
+             |
+             v
+Improve Scoring Accuracy
 ```
+
+After the multi-repository testing phase is completed, the project can move toward advanced security analysis, recommendations, visualization improvements, and other future features.
 
 ---
 
@@ -1170,18 +1444,58 @@ GitHub Repository URL
  Reports / History
 ```
 
-## Current Milestone
+---
+
+# Current Milestone
 
 **The GitHub Repository Health Analyzer now has a functional FastAPI backend with five analysis categories — Documentation, Testing, Code Structure, Security, and Maintainability — along with an initial React dashboard for displaying repository health scores and repository information.**
 
-The latest completed work includes:
+The five categories currently contribute equally to the overall score, with each category having a maximum of 20 points.
+
+### Latest Completed Work
 
 * **Security Analysis**
 * **Maintainability Analysis**
 * **Five-category health scoring**
+* **Explicit equal category weighting**
+* **Scoring accuracy improvements**
 * **Final backend testing**
 * **Initial React dashboard**
 * **Repository information display**
 * **Responsive score dashboard**
+* **Testing against the project's own GitHub repository**
 
-The **next development step is Phase 17 — Improving Scoring Accuracy**, followed by deeper analysis, detailed recommendations, advanced visualization, database/history, and deployment.
+### Current Work
+
+The project is currently in **Phase 17.8 — Multiple Repository Testing**.
+
+The current test is being performed against:
+
+```text
+https://github.com/pallets/flask
+```
+
+This test is being used to verify that the analyzer handles a Python repository correctly and that all five scoring categories continue to return valid results.
+
+### Immediate Next Steps
+
+```text
+Complete Python Repository Test
+            |
+            v
+Test Third Repository
+            |
+            v
+Compare Analysis Results
+            |
+            v
+Improve Detection Rules
+            |
+            v
+Refine Scoring Accuracy
+            |
+            v
+Phase 18 — Advanced Security
+```
+
+The project continues to follow an incremental development approach where each feature is implemented, tested, and verified before moving to the next stage.
