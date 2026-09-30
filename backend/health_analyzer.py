@@ -682,6 +682,68 @@ def get_testing_details(repository_files, package_content=None):
 # ============================================================
 # CODE STRUCTURE ANALYSIS
 # ============================================================
+def get_source_files(file_paths):
+
+    source_extensions = (
+        ".py",
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".java",
+        ".c",
+        ".cpp",
+        ".cs",
+        ".go",
+        ".php"
+    )
+
+    excluded_config_files = {
+        "vite.config.js",
+        "vite.config.ts",
+        "webpack.config.js",
+        "webpack.config.ts",
+        "babel.config.js",
+        "babel.config.cjs",
+        "jest.config.js",
+        "jest.config.cjs",
+        "vitest.config.js",
+        "vitest.config.ts",
+        "karma.conf.js"
+    }
+
+    source_files = []
+
+    for path in file_paths:
+
+        file_name = path.split("/")[-1]
+
+        # Skip configuration files
+        if file_name in excluded_config_files:
+            continue
+
+        # Skip test directories
+        path_parts = path.split("/")
+
+        if any(
+            folder in ["test", "tests", "__tests__", "spec", "specs"]
+            for folder in path_parts
+        ):
+            continue
+
+        # Skip common test naming conventions
+        if (
+            ".test." in file_name
+            or ".spec." in file_name
+            or file_name.startswith("test_")
+            or file_name.endswith("_test.py")
+        ):
+            continue
+
+        if path.endswith(source_extensions):
+            source_files.append(path)
+
+    return source_files
 
 def calculate_code_structure_score(repository_files):
 
@@ -706,27 +768,30 @@ def calculate_code_structure_score(repository_files):
     # 1. Organized project folders
     # --------------------------------
 
-    important_folders = [
-        "src/",
-        "app/",
-        "components/",
-        "backend/",
-        "frontend/",
-        "api/",
-        "utils/",
-        "services/",
-        "models/",
-        "controllers/"
+    important_folder_names = [
+        "src",
+        "app",
+        "components",
+        "backend",
+        "frontend",
+        "api",
+        "utils",
+        "services",
+        "models",
+        "controllers"
     ]
 
-    organized_folders = [
-        folder
-        for folder in important_folders
-        if any(
-            path.startswith(folder)
+    organized_folders = []
+
+    for folder in important_folder_names:
+
+        folder_detected = any(
+            folder in path.split("/")
             for path in file_paths
         )
-    ]
+
+        if folder_detected:
+            organized_folders.append(folder)
 
     folder_count = len(organized_folders)
 
@@ -743,25 +808,7 @@ def calculate_code_structure_score(repository_files):
     # 2. Source code files
     # --------------------------------
 
-    source_extensions = (
-        ".py",
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".java",
-        ".c",
-        ".cpp",
-        ".cs",
-        ".go",
-        ".php"
-    )
-
-    source_files = [
-        path
-        for path in file_paths
-        if path.endswith(source_extensions)
-    ]
+    source_files = get_source_files(file_paths)
 
     source_count = len(source_files)
 
@@ -843,27 +890,30 @@ def get_code_structure_details(repository_files):
     # 1. Organized project folders
     # --------------------------------
 
-    important_folders = [
-        "src/",
-        "app/",
-        "components/",
-        "backend/",
-        "frontend/",
-        "api/",
-        "utils/",
-        "services/",
-        "models/",
-        "controllers/"
+    important_folder_names = [
+        "src",
+        "app",
+        "components",
+        "backend",
+        "frontend",
+        "api",
+        "utils",
+        "services",
+        "models",
+        "controllers"
     ]
 
-    organized_folders = [
-        folder
-        for folder in important_folders
-        if any(
-            path.startswith(folder)
+    organized_folders = []
+
+    for folder in important_folder_names:
+
+        folder_detected = any(
+            folder in path.split("/")
             for path in file_paths
         )
-    ]
+
+        if folder_detected:
+            organized_folders.append(folder)
 
     if organized_folders:
 
@@ -886,25 +936,7 @@ def get_code_structure_details(repository_files):
     # 2. Source code files
     # --------------------------------
 
-    source_extensions = (
-        ".py",
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".java",
-        ".c",
-        ".cpp",
-        ".cs",
-        ".go",
-        ".php"
-    )
-
-    source_files = [
-        path
-        for path in file_paths
-        if path.endswith(source_extensions)
-    ]
+    source_files = get_source_files(file_paths)
 
     details.append({
         "type": "success" if source_files else "warning",
@@ -1001,7 +1033,8 @@ def calculate_security_score(repository_files):
         for path in file_paths
         if path
     ]
-        # --------------------------------
+
+    # --------------------------------
     # 6. Security automation
     # --------------------------------
 
@@ -1086,7 +1119,7 @@ def calculate_security_score(repository_files):
     if detected_dependencies:
         score += 3
 
-        # --------------------------------
+    # --------------------------------
     # 5. Security configuration files
     # --------------------------------
 
@@ -1456,27 +1489,30 @@ def calculate_maintainability_score(repository_files):
     # 2. Organized source structure
     # --------------------------------
 
-    important_folders = [
-        "src/",
-        "app/",
-        "components/",
-        "backend/",
-        "frontend/",
-        "api/",
-        "utils/",
-        "services/",
-        "models/",
-        "controllers/"
+    important_folder_names = [
+        "src",
+        "app",
+        "components",
+        "backend",
+        "frontend",
+        "api",
+        "utils",
+        "services",
+        "models",
+        "controllers"
     ]
 
-    organized_folders = [
-        folder
-        for folder in important_folders
-        if any(
-            path.startswith(folder)
+    organized_folders = []
+
+    for folder in important_folder_names:
+
+        folder_detected = any(
+            folder in path.split("/")
             for path in file_paths
         )
-    ]
+
+        if folder_detected:
+            organized_folders.append(folder)
 
     if len(organized_folders) >= 3:
         score += 4
@@ -1488,25 +1524,7 @@ def calculate_maintainability_score(repository_files):
     # 3. Source-file organization
     # --------------------------------
 
-    source_extensions = (
-        ".py",
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".java",
-        ".c",
-        ".cpp",
-        ".cs",
-        ".go",
-        ".php"
-    )
-
-    source_files = [
-        path
-        for path in file_paths
-        if path.endswith(source_extensions)
-    ]
+    source_files = get_source_files(file_paths)
 
     source_count = len(source_files)
 
@@ -1552,6 +1570,7 @@ def calculate_maintainability_score(repository_files):
         ".temp",
         ".bak",
         ".old",
+        ".backup",
         "~"
     ]
 
@@ -1626,27 +1645,30 @@ def get_maintainability_details(repository_files):
     # 2. Organized source structure
     # --------------------------------
 
-    important_folders = [
-        "src/",
-        "app/",
-        "components/",
-        "backend/",
-        "frontend/",
-        "api/",
-        "utils/",
-        "services/",
-        "models/",
-        "controllers/"
-    ]
+    important_folder_names = [
+            "src",
+            "app",
+            "components",
+            "backend",
+            "frontend",
+            "api",
+            "utils",
+            "services",
+            "models",
+            "controllers"
+        ]
 
-    organized_folders = [
-        folder
-        for folder in important_folders
-        if any(
-            path.startswith(folder)
+    organized_folders = []
+
+    for folder in important_folder_names:
+
+        folder_detected = any(
+            folder in path.split("/")
             for path in file_paths
         )
-    ]
+
+        if folder_detected:
+            organized_folders.append(folder)
 
     if len(organized_folders) >= 3:
 
@@ -1679,25 +1701,7 @@ def get_maintainability_details(repository_files):
     # 3. Source-file organization
     # --------------------------------
 
-    source_extensions = (
-        ".py",
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".java",
-        ".c",
-        ".cpp",
-        ".cs",
-        ".go",
-        ".php"
-    )
-
-    source_files = [
-        path
-        for path in file_paths
-        if path.endswith(source_extensions)
-    ]
+    source_files = get_source_files(file_paths)
 
     source_count = len(source_files)
 
@@ -1777,6 +1781,7 @@ def get_maintainability_details(repository_files):
         ".temp",
         ".bak",
         ".old",
+        ".backup",
         "~"
     ]
 
@@ -1807,3 +1812,307 @@ def get_maintainability_details(repository_files):
         })
 
     return details
+# ============================================================
+# RECOMMENDATIONS
+# ============================================================
+
+def generate_recommendations(
+    documentation_details,
+    testing_details,
+    code_structure_details,
+    security_details,
+    maintainability_details
+):
+
+    recommendations = []
+
+
+    # ========================================================
+    # DOCUMENTATION RECOMMENDATIONS
+    # ========================================================
+
+    for detail in documentation_details or []:
+
+        if detail.get("type") != "warning":
+            continue
+
+        message = detail.get("message", "")
+        message_lower = message.lower()
+
+        recommendation = (
+            "Improve the repository documentation "
+            "by adding the missing information."
+        )
+
+        if "readme" in message_lower:
+            recommendation = (
+                "Add or improve the README.md file with "
+                "clear project information, setup instructions, "
+                "usage instructions, and important features."
+            )
+
+        elif "description" in message_lower:
+            recommendation = (
+                "Add a clear repository description explaining "
+                "the purpose and functionality of the project."
+            )
+
+        elif "language" in message_lower:
+            recommendation = (
+                "Make sure the repository contains recognizable "
+                "source files so the primary programming language "
+                "can be identified."
+            )
+
+        elif "installation" in message_lower or "setup" in message_lower:
+            recommendation = (
+                "Add a Setup or Installation section to the README "
+                "with the steps required to run the project locally."
+            )
+
+        elif "usage" in message_lower:
+            recommendation = (
+                "Add a Usage section explaining how users or "
+                "developers can use the application."
+            )
+
+        elif "feature" in message_lower:
+            recommendation = (
+                "Document the main features and capabilities "
+                "of the project in the README."
+            )
+
+        recommendations.append({
+            "category": "Documentation",
+            "priority": "Medium",
+            "message": message,
+            "recommendation": recommendation
+        })
+
+
+    # ========================================================
+    # TESTING RECOMMENDATIONS
+    # ========================================================
+
+    for detail in testing_details or []:
+
+        if detail.get("type") != "warning":
+            continue
+
+        message = detail.get("message", "")
+        message_lower = message.lower()
+
+        recommendation = (
+            "Add automated tests and configure a testing "
+            "framework for the project."
+        )
+
+        if "test file" in message_lower or "test folder" in message_lower:
+            recommendation = (
+                "Create a dedicated tests or __tests__ folder "
+                "and add unit or integration test files for "
+                "important project functionality."
+            )
+
+        elif "configuration" in message_lower or "config" in message_lower:
+            recommendation = (
+                "Add a testing configuration such as Jest, "
+                "Vitest, Pytest, or another framework appropriate "
+                "for the project's technology stack."
+            )
+
+        elif "dependency" in message_lower:
+            recommendation = (
+                "Add the required testing dependencies to the "
+                "project dependency configuration."
+            )
+
+        elif "script" in message_lower:
+            recommendation = (
+                "Add a convenient test script to package.json "
+                "or the project's build configuration so tests "
+                "can be executed easily."
+            )
+
+        recommendations.append({
+            "category": "Testing",
+            "priority": "High",
+            "message": message,
+            "recommendation": recommendation
+        })
+
+
+    # ========================================================
+    # CODE STRUCTURE RECOMMENDATIONS
+    # ========================================================
+
+    for detail in code_structure_details or []:
+
+        if detail.get("type") != "warning":
+            continue
+
+        message = detail.get("message", "")
+        message_lower = message.lower()
+
+        recommendation = (
+            "Organize source files into clear folders "
+            "and keep related functionality together."
+        )
+
+        if "folder" in message_lower:
+            recommendation = (
+                "Create clear directories such as components, "
+                "services, utilities, pages, or modules to "
+                "organize related files."
+            )
+
+        elif "source" in message_lower:
+            recommendation = (
+                "Maintain a clear source-code structure and "
+                "separate application logic into appropriate "
+                "modules or components."
+            )
+
+        elif "config" in message_lower:
+            recommendation = (
+                "Keep project configuration files organized "
+                "and clearly separated from application source code."
+            )
+
+        elif "nested" in message_lower:
+            recommendation = (
+                "Use meaningful nested folders where necessary "
+                "to group related functionality without creating "
+                "an unnecessarily deep directory structure."
+            )
+
+        recommendations.append({
+            "category": "Code Structure",
+            "priority": "Medium",
+            "message": message,
+            "recommendation": recommendation
+        })
+
+
+    # ========================================================
+    # SECURITY RECOMMENDATIONS
+    # ========================================================
+
+    for detail in security_details or []:
+
+        if detail.get("type") != "warning":
+            continue
+
+        message = detail.get("message", "")
+        message_lower = message.lower()
+
+        recommendation = (
+            "Review the repository security configuration "
+            "and make sure sensitive files and credentials "
+            "are protected."
+        )
+
+        if "gitignore" in message_lower:
+            recommendation = (
+                "Add a .gitignore file and exclude sensitive "
+                "files such as .env files, credentials, virtual "
+                "environments, build files, and local configuration."
+            )
+
+        elif "env" in message_lower:
+            recommendation = (
+                "Add an environment-variable template such as "
+                ".env.example and keep real credentials outside "
+                "the repository."
+            )
+
+        elif "security" in message_lower:
+            recommendation = (
+                "Add security documentation describing how "
+                "credentials, authentication, sensitive data, "
+                "and security-related configuration are handled."
+            )
+
+        elif "dependency" in message_lower:
+            recommendation = (
+                "Maintain a dependency file such as "
+                "requirements.txt or package.json and keep "
+                "dependencies updated."
+            )
+
+        elif "sensitive" in message_lower:
+            recommendation = (
+                "Remove sensitive or credential-like files from "
+                "the repository and add appropriate patterns to "
+                ".gitignore."
+            )
+
+        recommendations.append({
+            "category": "Security",
+            "priority": "High",
+            "message": message,
+            "recommendation": recommendation
+        })
+
+
+    # ========================================================
+    # MAINTAINABILITY RECOMMENDATIONS
+    # ========================================================
+
+    for detail in maintainability_details or []:
+
+        if detail.get("type") != "warning":
+            continue
+
+        message = detail.get("message", "")
+        message_lower = message.lower()
+
+        recommendation = (
+            "Improve the project structure, documentation, "
+            "and configuration to make future maintenance easier."
+        )
+
+        if "readme" in message_lower or "documentation" in message_lower:
+            recommendation = (
+                "Maintain clear project documentation so future "
+                "developers can understand the purpose, setup, "
+                "usage, and structure of the project."
+            )
+
+        elif "folder" in message_lower or "organized" in message_lower:
+            recommendation = (
+                "Organize related source files into meaningful "
+                "folders and keep the project structure consistent."
+            )
+
+        elif "source" in message_lower:
+            recommendation = (
+                "Keep source files modular and avoid placing too "
+                "much functionality into a single file."
+            )
+
+        elif "config" in message_lower:
+            recommendation = (
+                "Keep configuration files clearly organized and "
+                "use standard project configuration practices."
+            )
+
+        elif (
+            "temporary" in message_lower
+            or "backup" in message_lower
+            or "temp" in message_lower
+        ):
+            recommendation = (
+                "Remove temporary, backup, generated, or unnecessary "
+                "files from the repository to keep the codebase clean."
+            )
+
+        recommendations.append({
+            "category": "Maintainability",
+            "priority": "Medium",
+            "message": message,
+            "recommendation": recommendation
+        })
+
+
+    return recommendations

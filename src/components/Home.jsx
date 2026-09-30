@@ -1,53 +1,67 @@
-
 import { useState } from "react";
-
+import AnalysisCard from "./AnalysisCard";
+import Recommendations from "./Recommendations";
 function Home() {
   const [repoUrl, setRepoUrl] = useState("");
   const [repository, setRepository] = useState(null);
   const [healthScore, setHealthScore] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [recommendations, setRecommendations] = useState([]);
+  // =========================
+  // ANALYZE REPOSITORY
+  // =========================
 
   const analyzeRepository = async () => {
-  if (!repoUrl.trim()) {
-    setError("Please enter a GitHub repository URL.");
-    return;
-  }
-
-  setLoading(true);
-  setError("");
-  setRepository(null);
-  setHealthScore(null);
-
-  try {
-    const response = await fetch("http://127.0.0.1:8000/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        repo_url: repoUrl,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.detail || "Failed to analyze repository.");
+    if (!repoUrl.trim()) {
+      setError("Please enter a GitHub repository URL.");
+      return;
     }
 
-    setRepository(data.repository);
-    setHealthScore(data.health_score);
+    setLoading(true);
+    setError("");
+    setRecommendations([]);
+    setRepository(null);
+    setHealthScore(null);
 
-  } catch (error) {
-    setError(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            repo_url: repoUrl.trim(),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to analyze repository."
+        );
+      }
+
+      setRepository(data.repository);
+      setHealthScore(data.health_score);
+      setRecommendations(data.recommendations ?? []);
+
+    } catch (error) {
+      setError(
+        error.message ||
+        "Something went wrong while analyzing the repository."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // =========================
-  // Documentation
+  // DOCUMENTATION
   // =========================
 
   const documentationScore =
@@ -57,7 +71,7 @@ function Home() {
     healthScore?.documentation?.details ?? [];
 
   // =========================
-  // Testing
+  // TESTING
   // =========================
 
   const testingScore =
@@ -67,7 +81,7 @@ function Home() {
     healthScore?.testing?.details ?? [];
 
   // =========================
-  // Code Structure
+  // CODE STRUCTURE
   // =========================
 
   const codeStructureScore =
@@ -77,7 +91,7 @@ function Home() {
     healthScore?.code_structure?.details ?? [];
 
   // =========================
-  // Security
+  // SECURITY
   // =========================
 
   const securityScore =
@@ -87,7 +101,7 @@ function Home() {
     healthScore?.security?.details ?? [];
 
   // =========================
-  // Maintainability
+  // MAINTAINABILITY
   // =========================
 
   const maintainabilityScore =
@@ -97,13 +111,17 @@ function Home() {
     healthScore?.maintainability?.details ?? [];
 
   // =========================
-  // Overall Score
+  // OVERALL SCORE
   // =========================
 
-  const overallScore = healthScore?.overall ?? 0;
+  const overallScore =
+    healthScore?.overall ?? 0;
 
   return (
-    <main id="home" className="home">
+    <main
+      id="home"
+      className="home"
+    >
 
       {/* =========================
           HERO SECTION
@@ -120,10 +138,14 @@ function Home() {
         </h1>
 
         <p className="hero-text">
-          Enter a GitHub repository URL and get useful information
-          about your repository's health, structure, and development
-          activity.
+          Enter a GitHub repository URL and get useful
+          information about your repository's health,
+          structure, and development activity.
         </p>
+
+        {/* =========================
+            ANALYZER INPUT
+        ========================= */}
 
         <div
           id="analyzer"
@@ -137,6 +159,7 @@ function Home() {
               setRepoUrl(e.target.value)
             }
             placeholder="https://github.com/username/repository"
+            disabled={loading}
           />
 
           <button
@@ -149,6 +172,10 @@ function Home() {
           </button>
 
         </div>
+
+        {/* =========================
+            ERROR MESSAGE
+        ========================= */}
 
         {error && (
           <p className="error-message">
@@ -179,7 +206,6 @@ function Home() {
                 Repository Health Score
               </h2>
 
-
               {/* =========================
                   OVERALL SCORE
               ========================= */}
@@ -189,6 +215,7 @@ function Home() {
                 <div className="overall-score-header">
 
                   <div>
+
                     <h3>
                       Repository Health
                     </h3>
@@ -196,22 +223,27 @@ function Home() {
                     <p>
                       Overall repository quality
                     </p>
+
                   </div>
 
                   <div className="overall-score-number">
+
                     {overallScore}
-                    <span>/100</span>
+
+                    <span>
+                      /100
+                    </span>
+
                   </div>
 
                 </div>
-
 
                 <div className="score-progress">
 
                   <div
                     className="score-progress-fill"
                     style={{
-                      width: `${overallScore}%`
+                      width: `${overallScore}%`,
                     }}
                   ></div>
 
@@ -330,7 +362,7 @@ function Home() {
                     <div
                       className="category-progress-fill"
                       style={{
-                        width: `${documentationScore * 5}%`
+                        width: `${documentationScore * 5}%`,
                       }}
                     ></div>
 
@@ -360,7 +392,7 @@ function Home() {
                     <div
                       className="category-progress-fill"
                       style={{
-                        width: `${testingScore * 5}%`
+                        width: `${testingScore * 5}%`,
                       }}
                     ></div>
 
@@ -390,7 +422,7 @@ function Home() {
                     <div
                       className="category-progress-fill"
                       style={{
-                        width: `${codeStructureScore * 5}%`
+                        width: `${codeStructureScore * 5}%`,
                       }}
                     ></div>
 
@@ -420,7 +452,7 @@ function Home() {
                     <div
                       className="category-progress-fill"
                       style={{
-                        width: `${securityScore * 5}%`
+                        width: `${securityScore * 5}%`,
                       }}
                     ></div>
 
@@ -450,7 +482,7 @@ function Home() {
                     <div
                       className="category-progress-fill"
                       style={{
-                        width: `${maintainabilityScore * 5}%`
+                        width: `${maintainabilityScore * 5}%`,
                       }}
                     ></div>
 
@@ -466,288 +498,76 @@ function Home() {
 
 
           {/* =========================
-              DOCUMENTATION ANALYSIS
+              DETAILED ANALYSIS
           ========================= */}
 
-          {healthScore?.documentation && (
+          {healthScore && (
 
-            <div className="documentation-details">
+            <div className="detailed-analysis-section">
 
-              <h2>
-                Documentation Analysis
-              </h2>
+              <div className="section-title">
 
-              <div className="documentation-score">
+                <h2>
+                  Detailed Repository Analysis
+                </h2>
 
-                Documentation Score:{" "}
-
-                <strong>
-                  {documentationScore}/20
-                </strong>
+                <p>
+                  Review the strengths and areas for
+                  improvement identified in each category.
+                </p>
 
               </div>
 
-              <div className="documentation-findings">
 
-                {documentationDetails.map(
-                  (detail, index) => (
+              {/* =========================
+                  ANALYSIS CARDS
+              ========================= */}
 
-                    <div
-                      key={index}
-                      className={`documentation-item ${detail.type}`}
-                    >
+              <div className="analysis-cards-grid">
 
-                      <span className="documentation-icon">
+                <AnalysisCard
+                  title="Documentation"
+                  score={documentationScore}
+                  details={documentationDetails}
+                />
 
-                        {detail.type === "success"
-                          ? "✓"
-                          : "⚠"}
+                <AnalysisCard
+                  title="Testing"
+                  score={testingScore}
+                  details={testingDetails}
+                />
 
-                      </span>
+                <AnalysisCard
+                  title="Code Structure"
+                  score={codeStructureScore}
+                  details={codeStructureDetails}
+                />
 
-                      <span>
-                        {detail.message}
-                      </span>
+                <AnalysisCard
+                  title="Security"
+                  score={securityScore}
+                  details={securityDetails}
+                />
 
-                    </div>
-
-                  )
-                )}
+                <AnalysisCard
+                  title="Maintainability"
+                  score={maintainabilityScore}
+                  details={maintainabilityDetails}
+                />
 
               </div>
 
             </div>
 
           )}
-
-
-          {/* =========================
-              TESTING ANALYSIS
-          ========================= */}
-
-          {healthScore?.testing && (
-
-            <div className="testing-details">
-
-              <h2>
-                Testing Analysis
-              </h2>
-
-              <div className="testing-score">
-
-                Testing Score:{" "}
-
-                <strong>
-                  {testingScore}/20
-                </strong>
-
-              </div>
-
-              <div className="testing-findings">
-
-                {testingDetails.map(
-                  (detail, index) => (
-
-                    <div
-                      key={index}
-                      className={`testing-item ${detail.type}`}
-                    >
-
-                      <span className="testing-icon">
-
-                        {detail.type === "success"
-                          ? "✓"
-                          : "⚠"}
-
-                      </span>
-
-                      <span>
-                        {detail.message}
-                      </span>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            </div>
-
-          )}
-
-
-          {/* =========================
-              CODE STRUCTURE ANALYSIS
-          ========================= */}
-
-          {healthScore?.code_structure && (
-
-            <div className="code-structure-details">
-
-              <h2>
-                Code Structure Analysis
-              </h2>
-
-              <div className="code-structure-score">
-
-                Code Structure Score:{" "}
-
-                <strong>
-                  {codeStructureScore}/20
-                </strong>
-
-              </div>
-
-              <div className="code-structure-findings">
-
-                {codeStructureDetails.map(
-                  (detail, index) => (
-
-                    <div
-                      key={index}
-                      className={`code-structure-item ${detail.type}`}
-                    >
-
-                      <span className="code-structure-icon">
-
-                        {detail.type === "success"
-                          ? "✓"
-                          : "⚠"}
-
-                      </span>
-
-                      <span>
-                        {detail.message}
-                      </span>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            </div>
-
-          )}
-
-
-          {/* =========================
-              SECURITY ANALYSIS
-          ========================= */}
-
-          {healthScore?.security && (
-
-            <div className="security-details">
-
-              <h2>
-                Security Analysis
-              </h2>
-
-              <div className="security-score">
-
-                Security Score:{" "}
-
-                <strong>
-                  {securityScore}/20
-                </strong>
-
-              </div>
-
-              <div className="security-findings">
-
-                {securityDetails.map(
-                  (detail, index) => (
-
-                    <div
-                      key={index}
-                      className={`security-item ${detail.type}`}
-                    >
-
-                      <span className="security-icon">
-
-                        {detail.type === "success"
-                          ? "✓"
-                          : "⚠"}
-
-                      </span>
-
-                      <span>
-                        {detail.message}
-                      </span>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            </div>
-
-          )}
-
-
-          {/* =========================
-              MAINTAINABILITY ANALYSIS
-          ========================= */}
-
-          {healthScore?.maintainability && (
-
-            <div className="maintainability-details">
-
-              <h2>
-                Maintainability Analysis
-              </h2>
-
-              <div className="maintainability-score">
-
-                Maintainability Score:{" "}
-
-                <strong>
-                  {maintainabilityScore}/20
-                </strong>
-
-              </div>
-
-              <div className="maintainability-findings">
-
-                {maintainabilityDetails.map(
-                  (detail, index) => (
-
-                    <div
-                      key={index}
-                      className={`maintainability-item ${detail.type}`}
-                    >
-
-                      <span className="maintainability-icon">
-
-                        {detail.type === "success"
-                          ? "✓"
-                          : "⚠"}
-
-                      </span>
-
-                      <span>
-                        {detail.message}
-                      </span>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            </div>
-
-          )}
-
+          {healthScore && (
+              <Recommendations
+                recommendations={recommendations}
+              />
+            )}
 
           {/* =========================
               REPOSITORY INFORMATION
-              UPDATED SECTION
           ========================= */}
 
           <div className="repository-section">
@@ -764,6 +584,10 @@ function Home() {
 
             </div>
 
+
+            {/* =========================
+                REPOSITORY INFO GRID
+            ========================= */}
 
             <div className="repository-info-grid">
 
@@ -859,7 +683,9 @@ function Home() {
             </div>
 
 
-            {/* Repository Description */}
+            {/* =========================
+                DESCRIPTION
+            ========================= */}
 
             <div className="repository-description">
 
@@ -875,7 +701,9 @@ function Home() {
             </div>
 
 
-            {/* GitHub Repository Link */}
+            {/* =========================
+                GITHUB LINK
+            ========================= */}
 
             <div className="repository-link">
 

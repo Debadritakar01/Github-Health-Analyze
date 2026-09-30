@@ -24,14 +24,23 @@ from health_analyzer import (
     get_security_details,
 
     calculate_maintainability_score,
-    get_maintainability_details
+    get_maintainability_details,
+
+    generate_recommendations
 )
 
+
+# ============================================================
+# FASTAPI APPLICATION
+# ============================================================
 
 app = FastAPI()
 
 
-# CORS configuration
+# ============================================================
+# CORS CONFIGURATION
+# ============================================================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -46,12 +55,18 @@ app.add_middleware(
 )
 
 
-# Request model
+# ============================================================
+# REQUEST MODEL
+# ============================================================
+
 class RepositoryRequest(BaseModel):
     repo_url: str
 
 
-# Validate GitHub repository URL
+# ============================================================
+# VALIDATE GITHUB REPOSITORY URL
+# ============================================================
+
 def validate_github_url(repo_url: str):
 
     parsed_url = urlparse(repo_url)
@@ -79,7 +94,10 @@ def validate_github_url(repo_url: str):
     }
 
 
-# Home endpoint
+# ============================================================
+# HOME ENDPOINT
+# ============================================================
+
 @app.get("/")
 def home():
 
@@ -88,18 +106,27 @@ def home():
     }
 
 
-# Repository analysis endpoint
+# ============================================================
+# REPOSITORY ANALYSIS ENDPOINT
+# ============================================================
+
 @app.post("/analyze")
 async def analyze_repository(request: RepositoryRequest):
 
-    # Validate GitHub URL
+    # --------------------------------------------------------
+    # 1. Validate GitHub URL
+    # --------------------------------------------------------
+
     github_info = validate_github_url(request.repo_url)
 
     username = github_info["username"]
     repository_name = github_info["repository"]
 
 
-    # Get repository information
+    # --------------------------------------------------------
+    # 2. Get Repository Information
+    # --------------------------------------------------------
+
     repository_info = await get_repository_info(
         username,
         repository_name
@@ -112,16 +139,19 @@ async def analyze_repository(request: RepositoryRequest):
         )
 
 
-    # Get README content
+    # --------------------------------------------------------
+    # 3. Get README Content
+    # --------------------------------------------------------
+
     readme_content = await get_readme(
         username,
         repository_name
     )
 
 
-    # -----------------------------
-    # Documentation Analysis
-    # -----------------------------
+    # ========================================================
+    # DOCUMENTATION ANALYSIS
+    # ========================================================
 
     documentation_score = calculate_documentation_score(
         repository_info,
@@ -134,26 +164,35 @@ async def analyze_repository(request: RepositoryRequest):
     )
 
 
-    # Get repository files
+    # --------------------------------------------------------
+    # 4. Get Repository Files
+    # --------------------------------------------------------
+
     repository_files = await get_repository_contents(
         username,
         repository_name
     )
+
+
+    # --------------------------------------------------------
+    # 5. Get package.json
+    # --------------------------------------------------------
+
     package_content = await get_file_content(
         username,
-        repository,
+        repository_name,
         "package.json"
     )
 
 
-    # -----------------------------
-    # Testing Analysis
-    # -----------------------------
+    # ========================================================
+    # TESTING ANALYSIS
+    # ========================================================
 
     testing_score = calculate_testing_score(
-    repository_files,
-    package_content
-   )
+        repository_files,
+        package_content
+    )
 
     testing_details = get_testing_details(
         repository_files,
@@ -161,9 +200,9 @@ async def analyze_repository(request: RepositoryRequest):
     )
 
 
-    # -----------------------------
-    # Code Structure Analysis
-    # -----------------------------
+    # ========================================================
+    # CODE STRUCTURE ANALYSIS
+    # ========================================================
 
     code_structure_score = calculate_code_structure_score(
         repository_files
@@ -174,9 +213,9 @@ async def analyze_repository(request: RepositoryRequest):
     )
 
 
-    # -----------------------------
-    # Security Analysis
-    # -----------------------------
+    # ========================================================
+    # SECURITY ANALYSIS
+    # ========================================================
 
     security_score = calculate_security_score(
         repository_files
@@ -187,9 +226,9 @@ async def analyze_repository(request: RepositoryRequest):
     )
 
 
-    # -----------------------------
-    # Maintainability Analysis
-    # -----------------------------
+    # ========================================================
+    # MAINTAINABILITY ANALYSIS
+    # ========================================================
 
     maintainability_score = calculate_maintainability_score(
         repository_files
@@ -200,22 +239,55 @@ async def analyze_repository(request: RepositoryRequest):
     )
 
 
-    # -----------------------------
-    # Overall Health Score
-    # -----------------------------
+    # ========================================================
+    # RECOMMENDATIONS
+    # ========================================================
 
-    overall_score = (
-        documentation_score
-        + testing_score
-        + code_structure_score
-        + security_score
-        + maintainability_score
+    recommendations = generate_recommendations(
+        documentation_details,
+        testing_details,
+        code_structure_details,
+        security_details,
+        maintainability_details
     )
 
 
-    # -----------------------------
-    # Return Analysis Result
-    # -----------------------------
+    # ========================================================
+    # OVERALL HEALTH SCORE
+    # ========================================================
+
+    category_weights = {
+        "documentation": 1.0,
+        "testing": 1.0,
+        "code_structure": 1.0,
+        "security": 1.0,
+        "maintainability": 1.0
+    }
+
+
+    overall_score = round(
+        (
+            documentation_score
+            * category_weights["documentation"]
+
+            + testing_score
+            * category_weights["testing"]
+
+            + code_structure_score
+            * category_weights["code_structure"]
+
+            + security_score
+            * category_weights["security"]
+
+            + maintainability_score
+            * category_weights["maintainability"]
+        )
+    )
+
+
+    # ========================================================
+    # RETURN ANALYSIS RESULT
+    # ========================================================
 
     return {
         "message": "Repository analyzed successfully",
@@ -252,6 +324,7 @@ async def analyze_repository(request: RepositoryRequest):
                 "score": maintainability_score,
                 "details": maintainability_details
             }
-        }
-    }
+        },
 
+        "recommendations": recommendations
+    }
