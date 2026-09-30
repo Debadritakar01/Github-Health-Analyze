@@ -1001,6 +1001,24 @@ def calculate_security_score(repository_files):
         for path in file_paths
         if path
     ]
+        # --------------------------------
+    # 6. Security automation
+    # --------------------------------
+
+    security_automation_files = [
+        ".github/workflows/security-scan.yml",
+        ".github/workflows/security-scan.yaml",
+        ".github/workflows/dependency-review.yml",
+        ".github/workflows/dependency-review.yaml"
+    ]
+
+    security_automation_detected = any(
+        path in security_automation_files
+        for path in file_paths
+    )
+
+    if security_automation_detected:
+        score += 2
 
     # --------------------------------
     # 1. Check .gitignore
@@ -1068,8 +1086,31 @@ def calculate_security_score(repository_files):
     if detected_dependencies:
         score += 3
 
+        # --------------------------------
+    # 5. Security configuration files
     # --------------------------------
-    # 5. Check suspicious sensitive files
+
+    security_config_files = [
+        ".github/dependabot.yml",
+        ".github/dependabot.yaml",
+        ".github/workflows/security.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/codeql.yaml",
+        "codeql-config.yml",
+        "codeql-config.yaml"
+    ]
+
+    detected_security_configs = [
+        path
+        for path in file_paths
+        if path in security_config_files
+    ]
+
+    if detected_security_configs:
+        score += 3
+
+    # --------------------------------
+    # 7. Check suspicious sensitive files
     # --------------------------------
 
     sensitive_file_names = [
@@ -1096,8 +1137,12 @@ def calculate_security_score(repository_files):
         )
     ]
 
+    # No sensitive files should not automatically give
+# a large security score.
+# Only give a small positive point when none are detected.
+
     if not sensitive_files:
-        score += 7
+        score += 2
 
     return min(score, 20)
 
@@ -1245,9 +1290,79 @@ def get_security_details(repository_files):
             "type": "warning",
             "message": "No common dependency files detected."
         })
+        # --------------------------------
+    # 5. Security configuration
+    # --------------------------------
+
+    security_config_files = [
+        ".github/dependabot.yml",
+        ".github/dependabot.yaml",
+        ".github/workflows/security.yml",
+        ".github/workflows/security.yaml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/codeql.yaml",
+        "codeql-config.yml",
+        "codeql-config.yaml"
+    ]
+
+    detected_security_configs = [
+        path
+        for path in file_paths
+        if path in security_config_files
+    ]
+
+    if detected_security_configs:
+
+        details.append({
+            "type": "success",
+            "message": (
+                "Security configuration detected: "
+                + ", ".join(detected_security_configs)
+            )
+        })
+
+    else:
+
+        details.append({
+            "type": "warning",
+            "message": "No security configuration files detected."
+        })
 
     # --------------------------------
-    # 5. Sensitive files
+    # 6. Security automation
+    # --------------------------------
+
+    security_automation_files = [
+        ".github/workflows/security-scan.yml",
+        ".github/workflows/security-scan.yaml",
+        ".github/workflows/dependency-review.yml",
+        ".github/workflows/dependency-review.yaml"
+    ]
+
+    detected_security_automation = [
+        path
+        for path in file_paths
+        if path in security_automation_files
+    ]
+
+    if detected_security_automation:
+
+        details.append({
+            "type": "success",
+            "message": (
+                "Security automation detected: "
+                + ", ".join(detected_security_automation)
+            )
+        })
+
+    else:
+
+        details.append({
+            "type": "warning",
+            "message": "No security automation workflow detected."
+        })
+    # --------------------------------
+    # 7. Sensitive files
     # --------------------------------
 
     sensitive_file_names = [
@@ -1255,13 +1370,17 @@ def get_security_details(repository_files):
         ".env.local",
         ".env.production",
         ".env.development",
+        ".env.test",
         "credentials.json",
         "credentials.txt",
         "secrets.json",
         "secret.json",
         "private.key",
         "private.pem",
-        "id_rsa"
+        "id_rsa",
+        "id_rsa.pem",
+        "server.key",
+        "server.pem"
     ]
 
     sensitive_files = [
