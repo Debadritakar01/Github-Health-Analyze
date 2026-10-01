@@ -1,71 +1,70 @@
-# GitHub Repository Health Analyzer
-
-## Part 1 — Project Description
-
-### Overview
-
-**GitHub Repository Health Analyzer** is a web-based application designed to evaluate the overall health and quality of a GitHub repository.
+GitHub Repository Health Analyzer
+Part 1 — Project Description
+Overview
+GitHub Repository Health Analyzer is a web-based application designed to evaluate the overall health and quality of a GitHub repository.
 
 The user provides a GitHub repository URL, for example:
 
-```text
 https://github.com/username/repository
-```
-
 The application collects repository information through the GitHub API, analyzes repository structure and project files, calculates health metrics, and presents the results through a React dashboard.
 
-### Main Goal
-
+Main Goal
 The main goal of the project is to help developers quickly understand the documentation, testing, code organization, security indicators, and maintainability of a GitHub repository.
 
-### Health Metrics
-
+Health Metrics
 The analyzer evaluates five major areas:
 
-* **Documentation**
-* **Testing**
-* **Code Structure**
-* **Security**
-* **Maintainability**
+Documentation
 
-Each category contributes up to **20 points**, producing an overall Repository Health Score out of **100**.
+Testing
 
-### Technology Stack
+Code Structure
 
-#### Frontend
+Security
 
-* React
-* Vite
-* JavaScript
-* CSS
-* Recharts *(planned)*
+Maintainability
 
-#### Backend
+Each category contributes up to 20 points, producing an overall Repository Health Score out of 100.
 
-* Python
-* FastAPI
-* Uvicorn
-* HTTPX
-* Pydantic
+Technology Stack
+Frontend
+React
 
-#### External API
+Vite
 
-* GitHub REST API
+JavaScript
 
-#### Planned Analysis Tools
+CSS
 
-* Radon for Python code complexity
-* Bandit for Python security analysis
-* Dependency analysis
-* GitHub repository and commit data
+Recharts (planned)
 
-#### Planned Database
+Backend
+Python
 
-* PostgreSQL
+FastAPI
 
-### Basic Architecture
+Uvicorn
 
-```text
+HTTPX
+
+Pydantic
+
+External API
+GitHub REST API
+
+Planned Analysis Tools
+Radon for Python code complexity
+
+Bandit for Python security analysis
+
+Dependency analysis
+
+GitHub repository and commit data
+
+Planned Database
+PostgreSQL
+
+Basic Architecture
 User
   |
   v
@@ -90,196 +89,214 @@ JSON Analysis Result
   |
   v
 React Dashboard
-```
+Part 2 — Project Roadmap
+Phase 1 — React Project Setup
+Goal: Create the frontend foundation.
 
----
+Tasks
+Create React project using Vite
 
-# Part 2 — Project Roadmap
+Install dependencies
 
-## Phase 1 — React Project Setup
+Configure the main React files
 
-**Goal:** Create the frontend foundation.
+Understand Vite project structure
 
-### Tasks
+Create the basic application structure
 
-* Create React project using Vite
-* Install dependencies
-* Configure the main React files
-* Understand Vite project structure
-* Create the basic application structure
+Status: ✅ Completed
 
-**Status:** ✅ Completed
+Phase 2 — Frontend UI
+Goal: Build the basic user interface.
 
----
+Implemented
+Navbar
 
-## Phase 2 — Frontend UI
+Home page
 
-**Goal:** Build the basic user interface.
+Project title and description
 
-### Implemented
+Repository URL input
 
-* Navbar
-* Home page
-* Project title and description
-* Repository URL input
-* Analyze Repository button
-* Basic layout and styling
+Analyze Repository button
 
-**Status:** ✅ Completed
+Basic layout and styling
 
----
+Status: ✅ Completed
 
-## Phase 3 — Frontend Interactivity
+Phase 3 — Frontend Interactivity
+Goal: Make the React interface functional.
 
-**Goal:** Make the React interface functional.
+Implemented
+React useState
 
-### Implemented
+Repository URL handling
 
-* React `useState`
-* Repository URL handling
-* Button click handling
-* Input validation
-* Loading state
-* Error handling
-* Backend API request flow
-* Backend result handling
+Button click handling
 
-**Status:** ✅ Completed
+Input validation
 
----
+Loading state
 
-## Phase 4 — FastAPI Backend
+Error handling
 
-**Goal:** Create the backend API.
+Backend API request flow
 
-### Implemented
+Backend result handling
 
-* Python backend
-* Virtual environment
-* FastAPI
-* Uvicorn
-* HTTPX
-* Pydantic
-* `main.py`
-* `GET /`
-* `POST /analyze`
-* GitHub URL validation
-* Pydantic request model
-* GitHub API connection structure
+Status: ✅ Completed
 
-**Status:** ✅ Completed
+Phase 4 — FastAPI Backend
+Goal: Create the backend API.
 
-### API Documentation
+Implemented
+Python backend
 
+Virtual environment
+
+FastAPI
+
+Uvicorn
+
+HTTPX
+
+Pydantic
+
+main.py
+
+GET /
+
+POST /analyze
+
+GitHub URL validation
+
+Pydantic request model
+
+GitHub API connection structure
+
+Status: ✅ Completed
+
+API Documentation
 Swagger documentation is available at:
 
-```text
 http://127.0.0.1:8000/docs
-```
+Phase 5 — GitHub API Integration
+Goal: Collect repository information from GitHub.
 
----
+Implemented
+GitHub URL validation
 
-## Phase 5 — GitHub API Integration
+GitHub username extraction
 
-**Goal:** Collect repository information from GitHub.
+Repository name extraction
 
-### Implemented
+GitHub API request structure
 
-* GitHub URL validation
-* GitHub username extraction
-* Repository name extraction
-* GitHub API request structure
-* Request headers
-* HTTP timeout handling
-* HTTP status handling
-* Invalid response handling
-* Repository information retrieval
-* Repository file retrieval
+Request headers
 
-**Status:** ✅ Completed
+HTTP timeout handling
 
----
+HTTP status handling
 
-## Phase 6 — Repository Analysis Engine
+Invalid response handling
 
-**Goal:** Analyze the contents and structure of a GitHub repository.
+Repository information retrieval
 
-### Analysis Areas
+Repository file retrieval
 
-* Repository information
-* Repository file structure
-* Documentation
-* Testing
-* Code Structure
-* Security
-* Maintainability
+Status: ✅ Completed
+
+Phase 6 — Repository Analysis Engine
+Goal: Analyze the contents and structure of a GitHub repository.
+
+Analysis Areas
+Repository information
+
+Repository file structure
+
+Documentation
+
+Testing
+
+Code Structure
+
+Security
+
+Maintainability
 
 The analyzer processes repository information and file paths returned by the GitHub API.
 
-**Status:** 🟡 Implemented and being improved
+Status: 🟡 Implemented and being improved
 
----
+Phase 7 — Documentation Analysis
+Goal: Evaluate repository documentation.
 
-## Phase 7 — Documentation Analysis
+Current Checks
+README availability
 
-**Goal:** Evaluate repository documentation.
+Repository description
 
-### Current Checks
+Primary programming language
 
-* README availability
-* Repository description
-* Primary programming language
-* Documentation-related information
+Documentation-related information
 
 The analyzer generates a documentation score and supporting details.
 
-**Status:** ✅ Implemented
+Status: ✅ Implemented
 
----
+Phase 8 — Testing Analysis
+Goal: Detect testing-related files and evaluate repository testing support.
 
-## Phase 8 — Testing Analysis
+Current Checks
+Test directories
 
-**Goal:** Detect testing-related files and evaluate repository testing support.
+Test files
 
-### Current Checks
+.test.js
 
-* Test directories
-* Test files
-* `.test.js`
-* `.test.jsx`
-* `.test.ts`
-* `.test.tsx`
-* `.spec.js`
-* `.spec.jsx`
-* `.spec.ts`
-* `.spec.tsx`
-* Python test files
-* Testing framework configuration
-* Testing dependency indicators
-* Multiple test files
-* Test-related scripts/configuration
+.test.jsx
+
+.test.ts
+
+.test.tsx
+
+.spec.js
+
+.spec.jsx
+
+.spec.ts
+
+.spec.tsx
+
+Python test files
+
+Testing framework configuration
+
+Testing dependency indicators
+
+Multiple test files
+
+Test-related scripts/configuration
 
 The analyzer generates a testing score out of 20 and descriptive analysis details.
 
-**Status:** ✅ Implemented / Being improved
+Status: ✅ Implemented / Being improved
 
----
+Phase 9 — Code Structure Analysis
+Goal: Evaluate how well the repository is organized.
 
-## Phase 9 — Code Structure Analysis
+Current Checks
+Common project folders
 
-**Goal:** Evaluate how well the repository is organized.
+Source file count
 
-### Current Checks
+Configuration files
 
-* Common project folders
-* Source file count
-* Configuration files
-* Repository subdirectories
-* Overall file organization
+Repository subdirectories
 
-### Detected Project Folders
+Overall file organization
 
-```text
+Detected Project Folders
 src/
 app/
 components/
@@ -290,11 +307,7 @@ utils/
 services/
 models/
 controllers/
-```
-
-### Detected Configuration Files
-
-```text
+Detected Configuration Files
 package.json
 requirements.txt
 pyproject.toml
@@ -303,82 +316,107 @@ build.gradle
 vite.config.js
 vite.config.ts
 tsconfig.json
-```
-
 The analyzer returns both a numerical score and human-readable analysis messages.
 
-**Status:** ✅ Implemented and tested
+Status: ✅ Implemented and tested
 
----
+Phase 9.1 — Score Dashboard
+Goal: Display repository health scores through a clear dashboard.
 
-## Phase 9.1 — Score Dashboard
+Implemented
+Overall Repository Health card
 
-**Goal:** Display repository health scores through a clear dashboard.
+Overall health score
 
-### Implemented
+/100 score display
 
-* Overall Repository Health card
-* Overall health score
-* `/100` score display
-* Overall progress bar
-* Documentation score
-* Testing score
-* Code Structure score
-* Security score
-* Maintainability score
-* Category progress bars
-* Responsive score layout
+Overall progress bar
 
-**Status:** ✅ Completed
+Documentation score
 
----
+Testing score
 
-## Phase 9.2 — Dashboard CSS Styling
+Code Structure score
 
-**Goal:** Improve the visual appearance of the score dashboard.
+Security score
 
-### Implemented
+Maintainability score
 
-* Dashboard cards
-* Rounded cards
-* Shadows
-* Progress bars
-* Category score cards
-* Responsive layout
-* Mobile-friendly layout
-* Improved spacing and typography
+Category progress bars
 
-**Status:** ✅ Completed
+Responsive score layout
 
----
+Status: ✅ Completed
 
-## Phase 9.3 — Repository Information Section
+Phase 9.2 — Dashboard CSS Styling
+Goal: Improve the visual appearance of the score dashboard.
 
-**Goal:** Display repository information in a structured dashboard section.
+Implemented
+Dashboard cards
 
-### Implemented
+Rounded cards
 
-* Repository name
-* Programming language
-* Stars
-* Forks
-* Open issues
-* Default branch
-* Repository description
-* GitHub repository link
-* Responsive repository information card
+Shadows
 
-**Status:** ✅ Implemented / Testing
+Progress bars
 
----
+Category score cards
 
-## Phase 9.4 — Detailed Analysis Cards
+Responsive layout
 
-**Goal:** Display detailed analysis findings for each health category.
+Mobile-friendly layout
 
-### Planned Structure
+Improved spacing and typography
 
-```text
+Status: ✅ Completed
+
+Phase 9.3 — Repository Information Section
+Goal: Display repository information in a structured dashboard section.
+
+Implemented
+Repository name
+
+Programming language
+
+Stars
+
+Forks
+
+Open issues
+
+Default branch
+
+Repository description
+
+GitHub repository link
+
+Responsive repository information card
+
+Status: ✅ Implemented / Testing
+
+Phase 9.4 — Detailed Analysis Cards
+Goal: Display detailed analysis findings for each health category.
+
+Implemented
+Documentation analysis details
+
+Testing analysis details
+
+Code Structure analysis details
+
+Security analysis details
+
+Maintainability analysis details
+
+Success messages
+
+Warning messages
+
+Category-specific findings
+
+Responsive analysis-card layout
+
+Structure
 Analysis Details
        |
        +---- Documentation
@@ -400,35 +438,37 @@ Analysis Details
        +---- Maintainability
                +---- Success
                +---- Warning
-```
+Status: ✅ Completed
 
-**Status:** 🔄 In Progress
+Phase 10 — Security Analysis
+Goal: Detect repository security indicators and potentially sensitive files.
 
----
+Current Checks
+.gitignore
 
-# Phase 10 — Security Analysis
+Environment template files
 
-**Goal:** Detect repository security indicators and potentially sensitive files.
+Security documentation
 
-### Current Checks
+Dependency/configuration files
 
-* `.gitignore`
-* Environment template files
-* Security documentation
-* Dependency/configuration files
-* Potentially sensitive filenames
-* `.env` files
-* Credential files
-* Secret files
-* `.pem` files
-* `.key` files
-* SSH private key indicators
+Potentially sensitive filenames
 
-### Security Scoring
+.env files
 
-The current security score has a maximum of **20 points**.
+Credential files
 
-```text
+Secret files
+
+.pem files
+
+.key files
+
+SSH private key indicators
+
+Security Scoring
+The current security score has a maximum of 20 points.
+
 .gitignore                         +4
 Environment template              +3
 Security documentation            +3
@@ -436,37 +476,32 @@ Dependency/configuration files    +3
 No obvious sensitive files        +7
                                    ---
 Maximum                           20
-```
+Important Limitation
+The current analyzer examines repository file paths.
 
-### Important Limitation
-
-The current analyzer examines **repository file paths**.
-
-It does **not yet claim to scan source-file contents or detect actual exposed secrets**.
+It does not yet claim to scan source-file contents or detect actual exposed secrets.
 
 Advanced security analysis using tools such as Bandit and dependency vulnerability scanning is planned for a future phase.
 
-**Status:** ✅ Basic analysis implemented
+Status: ✅ Basic analysis implemented
 
----
+Phase 11 — Maintainability Analysis
+Goal: Evaluate repository organization and maintainability indicators.
 
-# Phase 11 — Maintainability Analysis
+Current Checks
+README/documentation
 
-**Goal:** Evaluate repository organization and maintainability indicators.
+Organized project folders
 
-### Current Checks
+Source-file count
 
-* README/documentation
-* Organized project folders
-* Source-file count
-* Dependency/configuration management
-* Temporary or backup-looking files
+Dependency/configuration management
 
-### Maintainability Scoring
+Temporary or backup-looking files
 
-The current maintainability score has a maximum of **20 points**.
+Maintainability Scoring
+The current maintainability score has a maximum of 20 points.
 
-```text
 README/documentation             +4
 Organized source structure       +4
 Source-file organization         +4
@@ -474,27 +509,19 @@ Configuration/dependencies       +4
 No temporary/backup files        +4
                                   ---
 Maximum                          20
-```
-
-### Important Limitation
-
-The current implementation analyzes repository **file paths and structure**.
+Important Limitation
+The current implementation analyzes repository file paths and structure.
 
 It does not yet perform advanced code-complexity or duplicate-code analysis.
 
 Future versions may integrate tools such as Radon for Python complexity analysis.
 
-**Status:** ✅ Basic analysis implemented
+Status: ✅ Basic analysis implemented
 
----
+Phase 12 — Health Scoring Engine
+Goal: Combine the five analysis categories into an overall health score.
 
-# Phase 12 — Health Scoring Engine
-
-**Goal:** Combine the five analysis categories into an overall health score.
-
-### Scoring Structure
-
-```text
+Scoring Structure
 Documentation       /20
 Testing             /20
 Code Structure      /20
@@ -502,106 +529,174 @@ Security            /20
 Maintainability     /20
                     ----
 Overall             /100
-```
-
 The analyzer calculates the overall score by combining the five category scores.
 
-```text
 Overall Score =
 Documentation
 + Testing
 + Code Structure
 + Security
 + Maintainability
-```
+Status: 🔄 Implemented and being refined
 
-**Status:** 🔄 Implemented and being refined
+Phase 13 — Recommendations
+Goal: Provide actionable suggestions based on detected repository issues.
 
----
+Implemented
+Recommendation generation from warning details
 
-# Phase 13 — Recommendations
+Category-specific recommendations
 
-**Goal:** Provide useful suggestions based on detected repository issues.
+Documentation recommendations
 
-### Planned Recommendations
+Testing recommendations
 
-* Improve README documentation
-* Add testing support
-* Improve project organization
-* Add missing configuration files
-* Improve dependency management
-* Reduce code complexity
-* Address security issues
-* Improve maintainability
+Code Structure recommendations
 
-**Status:** ⏳ Pending
+Security recommendations
 
----
+Maintainability recommendations
 
-# Phase 14 — React + FastAPI Integration
+Priority levels
 
-**Goal:** Connect the backend analysis system with the React frontend.
+Detected issue display
 
-### Implemented
+Recommended action display
 
-* Repository URL input
-* React state management
-* Analysis request flow
-* Loading state
-* Error handling
-* Backend API request
-* Repository information display
-* Health score display
-* Category score display
+Recommendation cards in the React dashboard
 
-### Remaining Improvements
+Responsive recommendation layout
 
-* Display all backend analysis details
-* Improve detailed analysis cards
-* Refine API response handling
-* Improve frontend error states
-* Improve presentation of analysis results
+Recommendation Flow
+Analysis Details
+      |
+      v
+Detect Warning
+      |
+      v
+Read Warning Message
+      |
+      v
+Identify Specific Issue
+      |
+      v
+Generate Category-Specific Recommendation
+      |
+      v
+Display Recommendation Card
+Example
+Detected Issue:
+README is missing installation information.
 
-**Status:** 🔄 In Progress
+Recommended Action:
+Add a Setup or Installation section to the README
+with the steps required to run the project locally.
+The recommendation engine now uses the actual warning message instead of displaying the same generic recommendation for every warning.
 
----
+Status: ✅ Completed
 
-# Phase 15 — Dashboard and Visualization
+Phase 14 — React + FastAPI Integration
+Goal: Connect the backend analysis system with the React frontend.
 
-**Goal:** Present repository analysis clearly through a complete dashboard.
+Implemented
+Repository URL input
 
-### Implemented
+React state management
 
-* Overall health score
-* Documentation score
-* Testing score
-* Code Structure score
-* Security score
-* Maintainability score
-* Progress bars
-* Repository statistics
-* Repository information
-* Responsive dashboard layout
+Analysis request flow
 
-### Planned
+Loading state
 
-* Detailed analysis cards
-* Charts
-* Detected issues
-* Recommendations
-* Advanced visualizations
+Error handling
 
-**Status:** 🔄 In Progress
+Backend API request
 
----
+Repository information display
 
-# Phase 16 — Final Backend Testing
+Health score display
 
-**Goal:** Verify that all five analysis modules work together correctly.
+Category score display
 
-### Tested Flow
+Detailed analysis results
 
-```text
+Recommendation data handling
+
+Recommendation state management
+
+Recommendation component integration
+
+Frontend Recommendation Flow
+POST /analyze
+      |
+      v
+Backend Analysis
+      |
+      v
+Recommendations Generated
+      |
+      v
+React receives recommendations
+      |
+      v
+Recommendations component
+      |
+      v
+Recommendation cards
+Status: ✅ Completed / Refined
+
+Phase 15 — Dashboard and Visualization
+Goal: Present repository analysis clearly through a complete dashboard.
+
+Implemented
+Overall health score
+
+Documentation score
+
+Testing score
+
+Code Structure score
+
+Security score
+
+Maintainability score
+
+Progress bars
+
+Repository statistics
+
+Repository information
+
+Detailed analysis cards
+
+Detected issues
+
+Success/warning analysis messages
+
+Recommendations section
+
+Recommendation cards
+
+Category badges
+
+Priority badges
+
+Responsive dashboard layout
+
+Responsive recommendation layout
+
+Planned
+Advanced charts
+
+Historical score visualizations
+
+More advanced dashboard interactions
+
+Status: 🔄 In Progress
+
+Phase 16 — Final Backend Testing
+Goal: Verify that all five analysis modules work together correctly.
+
+Tested Flow
 GitHub Repository URL
           |
           v
@@ -637,23 +732,15 @@ GitHub Repository URL
           |
           v
        JSON Result
-```
-
-### Backend Verification
-
+Backend Verification
 The backend can be tested through:
 
-```text
 http://127.0.0.1:8000/docs
-```
+The POST /analyze endpoint is used to submit a GitHub repository URL and receive the analysis response.
 
-The `POST /analyze` endpoint is used to submit a GitHub repository URL and receive the analysis response.
-
-### Five-Category Result
-
+Five-Category Result
 The expected analysis structure is:
 
-```json
 {
   "health_score": {
     "overall": 70,
@@ -677,74 +764,85 @@ The expected analysis structure is:
       "score": 16,
       "details": []
     }
-  }
+  },
+  "recommendations": [
+    {
+      "category": "Documentation",
+      "priority": "Medium",
+      "message": "README is missing installation information.",
+      "recommendation": "Add a Setup or Installation section to the README."
+    }
+  ]
 }
-```
-
 The actual scores depend on the repository being analyzed.
 
-**Status:** ✅ Completed / Verified
+Status: ✅ Completed / Verified
 
----
+Phase 17 — Scoring Accuracy Improvement
+Goal: Improve the accuracy and reliability of repository health scoring.
 
-# Phase 17 — Scoring Accuracy Improvement
+Planned Improvements
+Improve test detection
 
-**Goal:** Improve the accuracy and reliability of repository health scoring.
+Improve configuration detection
 
-### Planned Improvements
+Reduce false positives
 
-* Improve test detection
-* Improve configuration detection
-* Reduce false positives
-* Improve security file detection
-* Improve maintainability rules
-* Improve source-file classification
-* Refine category scoring weights
-* Test against multiple repository types
-* Compare analysis results across different GitHub repositories
+Improve security file detection
 
----
+Improve maintainability rules
 
-## Phase 17.1 — Detection Rule Improvements
+Improve source-file classification
 
+Refine category scoring weights
+
+Test against multiple repository types
+
+Compare analysis results across different GitHub repositories
+
+Phase 17.1 — Detection Rule Improvements
 The analyzer detection rules were reviewed and improved to better identify repository structure, testing support, configuration files, security indicators, and maintainability indicators.
 
-**Status:** ✅ Completed
+Status: ✅ Completed
 
----
-
-## Phase 17.2 — Testing Detection Improvements
-
+Phase 17.2 — Testing Detection Improvements
 Testing detection was improved to recognize multiple testing conventions.
 
-### Supported Indicators
+Supported Indicators
+Test directories
 
-* Test directories
-* Test files
-* `.test.js`
-* `.test.jsx`
-* `.test.ts`
-* `.test.tsx`
-* `.spec.js`
-* `.spec.jsx`
-* `.spec.ts`
-* `.spec.tsx`
-* Python test files
-* Testing framework indicators
-* Testing dependencies
-* Test-related configuration
+Test files
 
-**Status:** ✅ Completed
+.test.js
 
----
+.test.jsx
 
-## Phase 17.3 — Code Structure Detection Improvements
+.test.ts
 
+.test.tsx
+
+.spec.js
+
+.spec.jsx
+
+.spec.ts
+
+.spec.tsx
+
+Python test files
+
+Testing framework indicators
+
+Testing dependencies
+
+Test-related configuration
+
+Status: ✅ Completed
+
+Phase 17.3 — Code Structure Detection Improvements
 Code structure detection was refined to identify common project organization patterns.
 
-### Detected Project Folders
-
-```text
+Detected Project Folders
 src/
 app/
 components/
@@ -755,11 +853,7 @@ utils/
 services/
 models/
 controllers/
-```
-
-### Detected Configuration Files
-
-```text
+Detected Configuration Files
 package.json
 requirements.txt
 pyproject.toml
@@ -768,261 +862,302 @@ build.gradle
 vite.config.js
 vite.config.ts
 tsconfig.json
-```
+Status: ✅ Completed
 
-**Status:** ✅ Completed
-
----
-
-## Phase 17.4 — Security Detection Improvements
-
+Phase 17.4 — Security Detection Improvements
 Security analysis was reviewed to identify potentially sensitive repository files and security-related configuration.
 
-### Current Checks
+Current Checks
+.gitignore
 
-* `.gitignore`
-* Environment template files
-* Security documentation
-* Dependency/configuration files
-* `.env` files
-* Credential files
-* Secret files
-* `.pem` files
-* `.key` files
-* SSH private key indicators
+Environment template files
+
+Security documentation
+
+Dependency/configuration files
+
+.env files
+
+Credential files
+
+Secret files
+
+.pem files
+
+.key files
+
+SSH private key indicators
 
 The analyzer currently focuses primarily on repository file paths.
 
 It does not yet claim to detect actual secrets inside source-file contents.
 
-**Status:** ✅ Completed
+Status: ✅ Completed
 
----
-
-## Phase 17.5 — Maintainability Detection Improvements
-
+Phase 17.5 — Maintainability Detection Improvements
 Maintainability analysis was refined to evaluate repository organization and maintainability indicators.
 
-### Current Checks
+Current Checks
+README/documentation
 
-* README/documentation
-* Organized project folders
-* Source-file count
-* Configuration/dependency files
-* Temporary or backup-looking files
+Organized project folders
+
+Source-file count
+
+Configuration/dependency files
+
+Temporary or backup-looking files
 
 Advanced code-complexity and duplicate-code analysis are planned for a future phase.
 
-**Status:** ✅ Completed
+Status: ✅ Completed
 
----
-
-## Phase 17.6 — False Positive Review
-
+Phase 17.6 — False Positive Review
 The scoring and detection rules were reviewed to reduce unnecessary or incorrect detections.
 
 The analyzer focuses on identifiable repository indicators rather than assuming that the presence or absence of a single file represents the complete quality of a project.
 
-**Status:** ✅ Completed
+Status: ✅ Completed
 
----
-
-## Phase 17.7 — Scoring Weights
-
+Phase 17.7 — Scoring Weights
 The five health categories use equal weighting.
 
-### Category Weights
+Category Weights
+Category	Maximum Score	Weight
+Documentation	20	1.0
+Testing	20	1.0
+Code Structure	20	1.0
+Security	20	1.0
+Maintainability	20	1.0
+Total	100	100%
+The scoring system uses an explicit category_weights structure so the weighting can be modified centrally in the future without changing the overall scoring architecture.
 
-| Category        | Maximum Score |   Weight |
-| --------------- | ------------: | -------: |
-| Documentation   |            20 |      1.0 |
-| Testing         |            20 |      1.0 |
-| Code Structure  |            20 |      1.0 |
-| Security        |            20 |      1.0 |
-| Maintainability |            20 |      1.0 |
-| **Total**       |       **100** | **100%** |
+The current implementation keeps all categories at 1.0, preserving the existing /100 scoring system.
 
-The scoring system uses an explicit `category_weights` structure so the weighting can be modified centrally in the future without changing the overall scoring architecture.
-
-The current implementation keeps all categories at `1.0`, preserving the existing `/100` scoring system.
-
-### Overall Score
-
-```text
+Overall Score
 Overall Score =
 Documentation
 + Testing
 + Code Structure
 + Security
 + Maintainability
-```
-
 Maximum possible score:
 
-```text
 20 + 20 + 20 + 20 + 20 = 100
-```
+Status: ✅ Completed
 
-**Status:** ✅ Completed
-
----
-
-## Phase 17.8 — Multiple Repository Testing
-
-**Goal:** Verify that the analyzer works correctly across different types of GitHub repositories.
+Phase 17.8 — Multiple Repository Testing
+Goal: Verify that the analyzer works correctly across different types of GitHub repositories.
 
 The analyzer is being tested against repositories with different programming languages, project structures, testing conventions, and configuration files.
 
-### Repository Test 1 — Own Project
-
+Repository Test 1 — Own Project
 Repository:
 
-```text
 https://github.com/Debadritakar01/Github-Health-Analyze
-```
+The project was tested through the /analyze endpoint.
 
-The project was tested through the `/analyze` endpoint.
+Verified
+Repository URL processing
 
-### Verified
+GitHub API communication
 
-* Repository URL processing
-* GitHub API communication
-* Repository information retrieval
-* Repository file retrieval
-* Documentation scoring
-* Testing scoring
-* Code Structure scoring
-* Security scoring
-* Maintainability scoring
-* Overall health score
-* JSON response generation
+Repository information retrieval
 
-**Status:** ✅ Completed
+Repository file retrieval
 
----
+Documentation scoring
 
-### Repository Test 2 — Python Project
+Testing scoring
 
+Code Structure scoring
+
+Security scoring
+
+Maintainability scoring
+
+Overall health score
+
+JSON response generation
+
+Status: ✅ Completed
+
+Repository Test 2 — Python Project
 Repository:
 
-```text
 https://github.com/pallets/flask
-```
-
 This test is being used to verify the analyzer against a large Python-based project.
 
-### Verification Areas
+Verification Areas
+Repository information
 
-* Repository information
-* Python project detection
-* Testing detection
-* Testing framework indicators
-* Code structure detection
-* Security indicators
-* Maintainability indicators
-* Overall health score
-* `/analyze` response reliability
+Python project detection
 
-**Status:** 🔄 In Progress
+Testing detection
 
----
+Testing framework indicators
 
-### Repository Test 3 — Repository with Tests and Configuration
+Code structure detection
 
+Security indicators
+
+Maintainability indicators
+
+Overall health score
+
+/analyze response reliability
+
+Status: 🔄 In Progress
+
+Repository Test 3 — Repository with Tests and Configuration
 A third repository will be tested after the Python repository test.
 
 The purpose is to verify detection of:
 
-* Multiple test files
-* Test directories
-* Testing configuration
-* Dependency/configuration files
-* Organized source structure
-* Security-related files
-* Maintainability indicators
+Multiple test files
 
-**Status:** ⏳ Pending
+Test directories
 
----
+Testing configuration
 
-# Phase 18 — Advanced Security and Code Analysis
+Dependency/configuration files
 
-**Goal:** Introduce deeper analysis beyond repository file paths.
+Organized source structure
 
-### Planned Features
+Security-related files
 
-* Bandit security analysis
-* Dependency vulnerability analysis
-* Python code complexity analysis
-* Radon integration
-* Secret detection
-* Dependency version analysis
-* Code-quality checks
-* Advanced security indicators
+Maintainability indicators
 
-**Status:** ⏳ Future Phase
+Status: ⏳ Pending
 
----
+Phase 18 — Advanced Security and Code Analysis
+Goal: Introduce deeper analysis beyond repository file paths.
 
-# Phase 19 — Recommendations Engine
+Planned Features
+Bandit security analysis
 
-**Goal:** Generate actionable recommendations from analysis results.
+Dependency vulnerability analysis
 
-### Planned Features
+Python code complexity analysis
 
-* Category-specific recommendations
-* Documentation suggestions
-* Testing suggestions
-* Security suggestions
-* Maintainability suggestions
-* Code organization suggestions
-* Priority-based recommendations
+Radon integration
 
-**Status:** ⏳ Future Phase
+Secret detection
 
----
+Dependency version analysis
 
-# Phase 20 — Database and Analysis History
+Code-quality checks
 
-**Goal:** Store previous repository analyses.
+Advanced security indicators
 
-### Planned Features
+Status: ⏳ Future Phase
 
-* PostgreSQL database
-* Analysis history
-* Repository history
-* Score changes over time
-* Previous reports
-* Repository comparison
-* Historical score charts
+Phase 19 — Recommendations Engine
+Goal: Generate actionable recommendations from analysis results.
 
-**Status:** ⏳ Future Phase
+Implemented
+Category-specific recommendations
 
----
+Documentation suggestions
 
-# Phase 21 — Advanced Features
+Testing suggestions
 
-### Possible Future Features
+Security suggestions
 
-* AI-generated recommendations
-* Dependency health analysis
-* Git activity analysis
-* Repository comparison
-* PDF reports
-* Score history charts
-* Authentication
-* Saved repositories
-* Deployment
+Maintainability suggestions
 
-**Status:** ⏳ Future Scope
+Code organization suggestions
 
----
+Priority-based recommendations
 
-# Part 3 — Current Progress
+Warning-message based recommendation selection
 
-## Current Project Structure
+Specific recommended actions for detected issues
 
-```text
+Recommendation Categories
+Documentation
+    |
+    +--> README
+    +--> Description
+    +--> Installation / Setup
+    +--> Usage
+    +--> Features
+
+Testing
+    |
+    +--> Test files / folders
+    +--> Testing configuration
+    +--> Testing dependencies
+    +--> Test scripts
+
+Code Structure
+    |
+    +--> Project folders
+    +--> Source organization
+    +--> Configuration
+    +--> Nested structure
+
+Security
+    |
+    +--> .gitignore
+    +--> Environment files
+    +--> Security documentation
+    +--> Dependencies
+    +--> Sensitive files
+
+Maintainability
+    |
+    +--> Documentation
+    +--> Folder organization
+    +--> Source organization
+    +--> Configuration
+    +--> Temporary / backup files
+Status: ✅ Completed / Being refined
+
+Phase 20 — Database and Analysis History
+Goal: Store previous repository analyses.
+
+Planned Features
+PostgreSQL database
+
+Analysis history
+
+Repository history
+
+Score changes over time
+
+Previous reports
+
+Repository comparison
+
+Historical score charts
+
+Status: ⏳ Future Phase
+
+Phase 21 — Advanced Features
+Possible Future Features
+AI-generated recommendations
+
+Dependency health analysis
+
+Git activity analysis
+
+Repository comparison
+
+PDF reports
+
+Score history charts
+
+Authentication
+
+Saved repositories
+
+Deployment
+
+Status: ⏳ Future Scope
+
+Part 3 — Current Progress
+Current Project Structure
 github-health-analyzer/
 │
 ├── .gitignore
@@ -1037,7 +1172,8 @@ github-health-analyzer/
 ├── src/
 │   ├── components/
 │   │   ├── Home.jsx
-│   │   └── Navbar.jsx
+│   │   ├── Navbar.jsx
+│   │   └── Recommendations.jsx
 │   ├── App.jsx
 │   ├── App.css
 │   ├── index.css
@@ -1047,39 +1183,65 @@ github-health-analyzer/
 ├── package.json
 ├── package-lock.json
 └── vite.config.js
-```
-
----
-
-# Frontend Progress
-
+Frontend Progress
 The React/Vite frontend has been successfully created and developed incrementally.
 
-### Implemented
+Implemented
+React + Vite setup
 
-* React + Vite setup
-* `App.jsx`
-* `Navbar.jsx`
-* `Home.jsx`
-* Basic application structure
-* Repository URL input
-* React state using `useState`
-* Analyze Repository button
-* Loading state
-* Error handling
-* Repository analysis request
-* Overall health score dashboard
-* Category score cards
-* Category progress bars
-* Responsive dashboard styling
-* Repository information section
-* Repository statistics
-* Repository description
-* GitHub repository link
+App.jsx
 
-### Current Frontend Flow
+Navbar.jsx
 
-```text
+Home.jsx
+
+Basic application structure
+
+Repository URL input
+
+React state using useState
+
+Analyze Repository button
+
+Loading state
+
+Error handling
+
+Repository analysis request
+
+Overall health score dashboard
+
+Category score cards
+
+Category progress bars
+
+Responsive dashboard styling
+
+Repository information section
+
+Repository statistics
+
+Repository description
+
+GitHub repository link
+
+Detailed analysis cards
+
+Recommendations component
+
+Recommendation state handling
+
+Category badges
+
+Priority badges
+
+Detected issue cards
+
+Recommended action cards
+
+Responsive recommendation styling
+
+Current Frontend Flow
 User enters GitHub URL
         |
         v
@@ -1107,48 +1269,69 @@ React Dashboard
         +---- Repository Information
         |
         +---- Analysis Details
-```
-
----
-
-# Backend Progress
-
+Backend Progress
 The FastAPI backend has been successfully created and the main analysis pipeline is functional.
 
-### Implemented
+Implemented
+Python virtual environment
 
-* Python virtual environment
-* FastAPI
-* Uvicorn
-* HTTPX
-* Pydantic
-* `main.py`
-* `github_api.py`
-* `health_analyzer.py`
-* `requirements.txt`
-* `GET /`
-* `POST /analyze`
-* GitHub URL validation
-* GitHub username/repository extraction
-* GitHub API request structure
-* Repository information retrieval
-* Repository file retrieval
-* Documentation scoring
-* Testing scoring
-* Code Structure scoring
-* Code Structure analysis details
-* Security scoring
-* Security analysis details
-* Maintainability scoring
-* Maintainability analysis details
-* Equal category weighting
-* Overall health score calculation
+FastAPI
 
----
+Uvicorn
 
-# Current Backend Flow
+HTTPX
 
-```text
+Pydantic
+
+main.py
+
+github_api.py
+
+health_analyzer.py
+
+requirements.txt
+
+GET /
+
+POST /analyze
+
+GitHub URL validation
+
+GitHub username/repository extraction
+
+GitHub API request structure
+
+Repository information retrieval
+
+Repository file retrieval
+
+Documentation scoring
+
+Testing scoring
+
+Code Structure scoring
+
+Code Structure analysis details
+
+Security scoring
+
+Security analysis details
+
+Maintainability scoring
+
+Maintainability analysis details
+
+Recommendation generation
+
+Category-specific recommendation rules
+
+Priority-based recommendations
+
+Equal category weighting
+
+Overall health score calculation
+
+Current Backend Flow
 POST /analyze
       |
       v
@@ -1190,92 +1373,91 @@ Calculate overall score
       |
       v
 Return JSON response
-```
-
----
-
-# Current Analysis Categories
-
-## Documentation
-
+Current Analysis Categories
+Documentation
 Checks documentation-related repository indicators such as:
 
-* README
-* Repository description
-* Programming language
-* Documentation information
+README
 
-**Maximum Score:** 20
+Repository description
 
----
+Programming language
 
-## Testing
+Documentation information
 
+Maximum Score: 20
+
+Testing
 Checks:
 
-* Test directories
-* Test files
-* Testing frameworks
-* Testing dependencies
-* Multiple test files
-* Test-related configuration
+Test directories
 
-**Maximum Score:** 20
+Test files
 
----
+Testing frameworks
 
-## Code Structure
+Testing dependencies
 
+Multiple test files
+
+Test-related configuration
+
+Maximum Score: 20
+
+Code Structure
 Checks:
 
-* Project folders
-* Source files
-* Configuration files
-* Repository organization
-* Directory structure
+Project folders
 
-**Maximum Score:** 20
+Source files
 
----
+Configuration files
 
-## Security
+Repository organization
 
+Directory structure
+
+Maximum Score: 20
+
+Security
 Checks:
 
-* `.gitignore`
-* Environment templates
-* Security documentation
-* Dependency/configuration files
-* Potentially sensitive filenames
-* Key and certificate file indicators
+.gitignore
 
-**Maximum Score:** 20
+Environment templates
 
-**Current limitation:** Security analysis currently works primarily from repository file paths and does not yet scan file contents for actual secrets.
+Security documentation
 
----
+Dependency/configuration files
 
-## Maintainability
+Potentially sensitive filenames
 
+Key and certificate file indicators
+
+Maximum Score: 20
+
+Current limitation: Security analysis currently works primarily from repository file paths and does not yet scan file contents for actual secrets.
+
+Maintainability
 Checks:
 
-* README/documentation
-* Organized project folders
-* Source-file count
-* Configuration/dependency files
-* Temporary or backup-looking files
+README/documentation
 
-**Maximum Score:** 20
+Organized project folders
 
-**Current limitation:** Advanced code complexity and duplicate-code analysis are not yet implemented.
+Source-file count
 
----
+Configuration/dependency files
 
-# API Response Structure
+Temporary or backup-looking files
 
-The `/analyze` endpoint is designed around the following structure:
+Maximum Score: 20
 
-```json
+Current limitation: Advanced code complexity and duplicate-code analysis are not yet implemented.
+
+API Response Structure
+The /analyze endpoint is designed around the following structure:
+
 {
   "message": "Repository analyzed successfully",
   "repository": {
@@ -1303,71 +1485,150 @@ The `/analyze` endpoint is designed around the following structure:
       "score": 16,
       "details": []
     }
-  }
+  },
+  "recommendations": [
+    {
+      "category": "Documentation",
+      "priority": "Medium",
+      "message": "README is missing installation information.",
+      "recommendation": "Add a Setup or Installation section to the README."
+    }
+  ]
 }
-```
-
 The exact scores depend on the repository being analyzed.
 
----
+Latest Feature Update — Recommendation System
+The project now includes a recommendation workflow that converts detected warnings into actionable, category-specific suggestions.
 
-# Current Development Status
+Recommendation Workflow
+Repository Analysis
+        |
+        v
+Category Details
+        |
+        v
+Warning Detected
+        |
+        v
+Recommendation Engine
+        |
+        v
+Identify Warning Type
+        |
+        v
+Generate Specific Action
+        |
+        v
+React Recommendation Card
+Recommendation Card Contains
+Category
 
-## Completed
+Priority
 
-* ✅ React/Vite project setup
-* ✅ Basic frontend UI
-* ✅ Repository URL input
-* ✅ React state management
-* ✅ FastAPI backend
-* ✅ GitHub URL validation
-* ✅ GitHub API integration
-* ✅ Repository information retrieval
-* ✅ Repository file retrieval
-* ✅ Documentation analysis
-* ✅ Testing analysis foundation
-* ✅ Code Structure scoring
-* ✅ Code Structure detail analysis
-* ✅ Security analysis
-* ✅ Maintainability analysis
-* ✅ Overall health score
-* ✅ Equal category weighting
-* ✅ Scoring weight configuration
-* ✅ Category score cards
-* ✅ Progress bars
-* ✅ Dashboard CSS styling
-* ✅ Responsive dashboard layout
-* ✅ Repository information section
-* ✅ Repository statistics
-* ✅ Final backend analysis flow testing
-* ✅ Testing against own GitHub repository
+Detected issue
 
----
+Recommended action
 
-## Currently Working On
+The React recommendation section is responsive and includes category and priority badges. The backend recommendation engine checks the warning message and selects a more specific action for Documentation, Testing, Code Structure, Security, and Maintainability issues.
 
-* 🔄 Testing the analyzer against a Python repository
-* 🔄 Testing multiple repository types
-* 🔄 Improving scoring accuracy
-* 🔄 Identifying false positives
-* 🔄 Improving detection rules
-* 🔄 Validating the five-category scoring system
-* 🔄 Improving React + FastAPI integration
-* 🔄 Displaying all backend analysis details in the frontend
-* 🔄 Improving detailed analysis cards
-* 🔄 Improving repository statistics presentation
+Current Development Status
+Completed
+✅ React/Vite project setup
 
----
+✅ Basic frontend UI
 
-# Next Development Step
+✅ Repository URL input
 
-## Phase 17.8 — Complete Multiple Repository Testing
+✅ React state management
 
+✅ FastAPI backend
+
+✅ GitHub URL validation
+
+✅ GitHub API integration
+
+✅ Repository information retrieval
+
+✅ Repository file retrieval
+
+✅ Documentation analysis
+
+✅ Testing analysis foundation
+
+✅ Code Structure scoring
+
+✅ Code Structure detail analysis
+
+✅ Security analysis
+
+✅ Maintainability analysis
+
+✅ Overall health score
+
+✅ Equal category weighting
+
+✅ Scoring weight configuration
+
+✅ Category score cards
+
+✅ Progress bars
+
+✅ Dashboard CSS styling
+
+✅ Responsive dashboard layout
+
+✅ Repository information section
+
+✅ Repository statistics
+
+✅ Detailed analysis cards
+
+✅ Success/warning analysis details
+
+✅ Recommendations component
+
+✅ Category-specific recommendation engine
+
+✅ Recommendation priority badges
+
+✅ Responsive recommendation styling
+
+✅ Final backend analysis flow testing
+
+✅ Testing against own GitHub repository
+
+Currently Working On
+🔄 Testing the analyzer against a Python repository
+
+🔄 Testing multiple repository types
+
+🔄 Improving scoring accuracy
+
+🔄 Identifying false positives
+
+🔄 Improving detection rules
+
+🔄 Validating the five-category scoring system
+
+🔄 Improving React + FastAPI integration
+
+🔄 Testing the analyzer against multiple repository types
+
+🔄 Improving scoring accuracy
+
+🔄 Identifying false positives
+
+🔄 Refining detection rules
+
+🔄 Improving dashboard visualizations
+
+🔄 Adding advanced analysis features
+
+Next Development Step
+Complete Multiple Repository Testing
 The current development step is to complete testing against multiple repository types.
 
-### Testing Sequence
-
-```text
+Testing Sequence
 Own React/JavaScript Repository
              |
              v
@@ -1396,21 +1657,15 @@ Refine Detection Rules
              |
              v
 Improve Scoring Accuracy
-```
+After multi-repository testing is completed, the project can move toward advanced security analysis, deeper code analysis, database/history features, and other future improvements.
 
-After the multi-repository testing phase is completed, the project can move toward advanced security analysis, recommendations, visualization improvements, and other future features.
-
----
-
-# Project Development Principle
-
+Project Development Principle
 The project is being developed incrementally.
 
 Each feature is implemented, tested, and verified before moving to the next stage.
 
 The target final workflow is:
 
-```text
 GitHub Repository URL
           |
           v
@@ -1442,44 +1697,51 @@ GitHub Repository URL
           |
           v
  Reports / History
-```
-
----
-
-# Current Milestone
-
-**The GitHub Repository Health Analyzer now has a functional FastAPI backend with five analysis categories — Documentation, Testing, Code Structure, Security, and Maintainability — along with an initial React dashboard for displaying repository health scores and repository information.**
+Current Milestone
+The GitHub Repository Health Analyzer now has a functional FastAPI backend with five analysis categories — Documentation, Testing, Code Structure, Security, and Maintainability — along with a React dashboard for displaying repository health scores, detailed findings, repository information, and actionable recommendations.
 
 The five categories currently contribute equally to the overall score, with each category having a maximum of 20 points.
 
-### Latest Completed Work
+Latest Completed Work
+Security Analysis
 
-* **Security Analysis**
-* **Maintainability Analysis**
-* **Five-category health scoring**
-* **Explicit equal category weighting**
-* **Scoring accuracy improvements**
-* **Final backend testing**
-* **Initial React dashboard**
-* **Repository information display**
-* **Responsive score dashboard**
-* **Testing against the project's own GitHub repository**
+Maintainability Analysis
 
-### Current Work
+Five-category health scoring
 
-The project is currently in **Phase 17.8 — Multiple Repository Testing**.
+Explicit equal category weighting
+
+Scoring accuracy improvements
+
+Final backend testing
+
+React dashboard
+
+Repository information display
+
+Responsive score dashboard
+
+Detailed analysis cards
+
+Success and warning findings
+
+Recommendations section
+
+Responsive recommendation cards
+
+Category-specific recommendation engine
+
+Testing against the project's own GitHub repository
+
+Current Work
+The project is currently focused on multiple repository testing and scoring refinement.
 
 The current test is being performed against:
 
-```text
 https://github.com/pallets/flask
-```
-
 This test is being used to verify that the analyzer handles a Python repository correctly and that all five scoring categories continue to return valid results.
 
-### Immediate Next Steps
-
-```text
+Immediate Next Steps
 Complete Python Repository Test
             |
             v
@@ -1496,6 +1758,10 @@ Refine Scoring Accuracy
             |
             v
 Phase 18 — Advanced Security
-```
-
+            |
+            v
+Advanced Code Analysis
+            |
+            v
+Database / Analysis History
 The project continues to follow an incremental development approach where each feature is implemented, tested, and verified before moving to the next stage.
